@@ -1,9 +1,6 @@
 package chess;
 
-import chess.piece_movements.BishopMovesCalculator;
-import chess.piece_movements.KnightMovesCalculator;
-import chess.piece_movements.QueenMovesCalculator;
-import chess.piece_movements.RookMovesCalculator;
+import chess.piece_movements.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -75,6 +72,9 @@ public class ChessPiece {
                 case KNIGHT:
                     PieceMovesCalculator movesCalculator4 = new KnightMovesCalculator();
                     moves.addAll(movesCalculator4.pieceMoves(board, myPosition));
+                case KING:
+                    PieceMovesCalculator movesCalculator5 = new KingMovesCalculator();
+                    moves.addAll(movesCalculator5.pieceMoves(board, myPosition));
             }
         }
 
