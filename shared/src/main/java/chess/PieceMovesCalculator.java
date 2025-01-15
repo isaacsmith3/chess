@@ -9,25 +9,15 @@ public interface PieceMovesCalculator {
         int col = myPosition.getColumn();
         int row = myPosition.getRow();
 
-        if (col > 8 || col < 1 || row > 8 || row <= 1) {
+        if (col > 8 || col < 1 || row > 8 || row < 1) {
             return true;
         }
 
         return false;
     }
 
-//    default boolean emptySquare(int row, int col, ChessBoard board) {
-//        ChessPosition position = new ChessPosition(row, col);
-//        ChessPiece piece = board.getPiece(position);
-//        if (piece == null) {
-//            return false;
-//        } else {
-//            return true;
-//        }
-//    }
-
     default boolean isValidMove(ChessMove possibleMove, ChessPosition startPosition, ChessPosition newPosition, ChessBoard board, Collection<ChessMove> moves) {
-        if (outsideBoard(newPosition)) {
+        if (outsideBoard(newPosition)) { // off the board
             return false;
         }
 

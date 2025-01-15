@@ -10,8 +10,6 @@ public class BishopMovesCalculator implements PieceMovesCalculator {
 
     @Override
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        System.out.println("Bishop moves: " + myPosition);
-
         Collection<ChessMove> moves = new ArrayList<>();
 
         // Begin calculation
@@ -58,9 +56,6 @@ public class BishopMovesCalculator implements PieceMovesCalculator {
         j = col;
         for (int i = row-1; i >= 1; i--) {
             j--;
-            if (j < 1){ /// THIS
-                break;
-            }
             ChessPosition newPosition = new ChessPosition(i, j);
             ChessMove newMove = new ChessMove(myPosition, newPosition, null);
             if ((!isValidMove(newMove, myPosition, newPosition, board, moves))) {
