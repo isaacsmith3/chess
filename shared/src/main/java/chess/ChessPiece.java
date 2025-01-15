@@ -1,6 +1,7 @@
 package chess;
 
 import chess.piece_movements.BishopMovesCalculator;
+import chess.piece_movements.RookMovesCalculator;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -63,6 +64,9 @@ public class ChessPiece {
                 case BISHOP:
                     PieceMovesCalculator movesCalculator = new BishopMovesCalculator();
                     moves.addAll(movesCalculator.pieceMoves(board, myPosition));
+                case ROOK:
+                    PieceMovesCalculator movesCalculator2 = new RookMovesCalculator();
+                    moves.addAll(movesCalculator2.pieceMoves(board, myPosition));
             }
         }
 
