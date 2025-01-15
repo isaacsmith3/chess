@@ -59,9 +59,10 @@ public class ChessPiece {
         Collection<ChessMove> moves = new ArrayList<>();
 
         if (piece != null) {
-            if (piece.type == PieceType.BISHOP) {
-                PieceMovesCalculator movesCalculator = new BishopMovesCalculator();
-                moves.addAll(movesCalculator.pieceMoves(board, myPosition));
+            switch (piece.type) {
+                case BISHOP:
+                    PieceMovesCalculator movesCalculator = new BishopMovesCalculator();
+                    moves.addAll(movesCalculator.pieceMoves(board, myPosition));
             }
         }
 
