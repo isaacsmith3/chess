@@ -1,6 +1,7 @@
 package chess;
 
 import chess.piece_movements.BishopMovesCalculator;
+import chess.piece_movements.KnightMovesCalculator;
 import chess.piece_movements.QueenMovesCalculator;
 import chess.piece_movements.RookMovesCalculator;
 
@@ -71,7 +72,9 @@ public class ChessPiece {
                 case QUEEN:
                     PieceMovesCalculator movesCalculator3 = new QueenMovesCalculator();
                     moves.addAll(movesCalculator3.pieceMoves(board, myPosition));
-
+                case KNIGHT:
+                    PieceMovesCalculator movesCalculator4 = new KnightMovesCalculator();
+                    moves.addAll(movesCalculator4.pieceMoves(board, myPosition));
             }
         }
 
