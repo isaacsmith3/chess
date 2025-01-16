@@ -80,6 +80,10 @@ public class ChessPiece {
                     PieceMovesCalculator movesCalculator5 = new KingMovesCalculator();
                     moves.addAll(movesCalculator5.pieceMoves(board, myPosition));
                     break;
+                case PAWN:
+                    PieceMovesCalculator movesCalculator6 = new PawnMovesCalculator();
+                    moves.addAll(movesCalculator6.pieceMoves(board, myPosition));
+                    break;
             }
         }
 

@@ -10,6 +10,7 @@ import static chess.ChessPiece.PieceType.ROOK;
  */
 public class ChessBoard {
     private ChessPiece[][] board = new ChessPiece[8][8];
+
     public ChessBoard() {
         resetBoard();
     }
@@ -41,8 +42,6 @@ public class ChessBoard {
      */
     public void resetBoard() {
         board = new ChessPiece[8][8];
-        ChessPosition position;
-        ChessPiece piece;
 
     }
 }

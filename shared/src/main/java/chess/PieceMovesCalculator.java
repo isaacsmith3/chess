@@ -16,6 +16,7 @@ public interface PieceMovesCalculator {
         return false;
     }
 
+    // for all pieces except the pawn
     default boolean isValidMove(ChessMove possibleMove, ChessPosition startPosition, ChessPosition newPosition, ChessBoard board, Collection<ChessMove> moves) {
         if (outsideBoard(newPosition)) { // off the board
             return false;

@@ -18,7 +18,6 @@ public class KingMovesCalculator implements PieceMovesCalculator {
         // Begin calculation
         int row = myPosition.getRow();
         int col = myPosition.getColumn();
-        int j = col;
 
         // up
         ChessPosition newPosition = new ChessPosition(row+1, col);
