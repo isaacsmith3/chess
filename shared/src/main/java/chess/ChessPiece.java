@@ -4,6 +4,7 @@ import chess.piece_movements.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  * Represents a single chess piece
@@ -19,6 +20,28 @@ public class ChessPiece {
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.type = type;
         this.teamColor = pieceColor;
+    }
+
+    @Override
+    public String toString() {
+        return "ChessPiece{" +
+                "type=" + type +
+                ", teamColor=" + teamColor +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessPiece that = (ChessPiece) o;
+        return type == that.type && teamColor == that.teamColor;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(type, teamColor);
     }
 
     /**
