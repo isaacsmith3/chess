@@ -18,8 +18,8 @@ public class ChessGame {
     public ChessGame() {
         currentTurn = TeamColor.WHITE;
         board = new ChessBoard();
-        gameOver = false;
         board.resetBoard();
+        gameOver = false;
     }
 
     /**
@@ -56,16 +56,29 @@ public class ChessGame {
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece piece = board.getPiece(startPosition);
         if (piece == null) {
-            return null;
+            return new ArrayList<>();
         }
 
         Collection<ChessMove> validMoves = new ArrayList<>();
-        ChessBoard originalBoard = board;
-
         Collection<ChessMove> calculatedMoves = piece.pieceMoves(board, startPosition);
-//        for (ChessMove move : calculatedMoves) {
-//
-//        }
+
+        for (ChessMove move : calculatedMoves) {
+            ChessPiece capturedPiece = board.getPiece(move.getEndPosition());
+            try {
+                board.removePiece(startPosition);
+                board.addPiece(move.getEndPosition(), piece);
+
+                if (!isInCheck(piece.getTeamColor())) {
+                    validMoves.add(move);
+                }
+            } finally {
+                board.removePiece(move.getEndPosition());
+                if (capturedPiece != null) {
+                    board.addPiece(move.getEndPosition(), capturedPiece);
+                }
+                board.addPiece(startPosition, piece);
+            }
+        }
 
         return validMoves;
     }
@@ -89,7 +102,7 @@ public class ChessGame {
     public boolean isInCheck(TeamColor teamColor) {
         Collection<ChessMove> otherTeamMoves = new ArrayList<>();
 
-        // Checking all the moves
+        // Checking all the moves other team's moves
         for (int i = 1; i <= 8; i++ ) {
             for (int j = 1; j <= 8; j++ ) {
                 ChessPiece piece = board.getPiece(new ChessPosition(i, j));
@@ -127,7 +140,33 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        for (int i = 1; i <= 8; i++ ) {
+            for (int j = 1; j <= 8; j++ ) {
+                ChessPosition position = new ChessPosition(i, j);
+                ChessPiece piece = board.getPiece(position);
+                if (piece != null && piece.getTeamColor() == teamColor) {
+                    if (!validMoves(position).isEmpty()) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Assess the position of a piece and return true if it is outside the board, else return false
+     *
+     * @param position the position to assess
+     */
+    public boolean isOutsideBoard(ChessPosition position) {
+        int row = position.getRow();
+        int column = position.getColumn();
+
+        if (row < 1 || row > 8 || column < 1 || column > 8) {
+            return true;
+        }
+        return false;
     }
 
     /**
