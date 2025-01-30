@@ -155,7 +155,7 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        if (isInCheck(teamColor) && isInImpureStalemate(teamColor)) {
+        if (isInCheck(teamColor) && isInPureStalemate(teamColor)) {
             this.gameOver = true;
             return true;
         }
@@ -164,7 +164,8 @@ public class ChessGame {
 
     /**
      * Determines if the given team is in stalemate, which here is defined as having
-     * no valid moves
+     * no valid moves. This version of the stalemate checks to see if the king is also in check in order
+     * to account for some corner cases
      *
      * @param teamColor which team to check for stalemate
      * @return True if the specified team is in stalemate, otherwise false
@@ -188,7 +189,14 @@ public class ChessGame {
     }
 
 
-    public boolean isInImpureStalemate(TeamColor teamColor) {
+    /**
+     * Determines if the given team is in stalemate, which here is defined as having
+     * no valid moves
+     *
+     * @param teamColor which team to check for stalemate
+     * @return True if the specified team is in stalemate, otherwise false
+     */
+    public boolean isInPureStalemate(TeamColor teamColor) {
         for (int i = 1; i <= 8; i++ ) {
             for (int j = 1; j <= 8; j++ ) {
                 ChessPosition position = new ChessPosition(i, j);
