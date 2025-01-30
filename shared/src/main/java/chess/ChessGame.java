@@ -98,9 +98,18 @@ public class ChessGame {
         }
 
         ChessPiece piece = board.getPiece(startPosition);
+        if (piece.getTeamColor() != currentTurn) {
+            throw new InvalidMoveException();
+        }
+
         board.removePiece(startPosition);
         board.addPiece(endPosition, piece);
 
+        if (currentTurn == TeamColor.BLACK) {
+            currentTurn = TeamColor.WHITE;
+        } else if (currentTurn == TeamColor.WHITE) {
+            currentTurn = TeamColor.BLACK;
+        }
     }
 
     /**
