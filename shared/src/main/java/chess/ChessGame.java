@@ -90,7 +90,17 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
+        ChessPosition startPosition = move.getStartPosition();
+        ChessPosition endPosition = move.getEndPosition();
+        Collection<ChessMove> validMoves = validMoves(startPosition);
+        if (!validMoves.contains(move)) {
+            throw new InvalidMoveException();
+        }
+
+        ChessPiece piece = board.getPiece(startPosition);
+        board.removePiece(startPosition);
+        board.addPiece(endPosition, piece);
+
     }
 
     /**
@@ -130,7 +140,7 @@ public class ChessGame {
      */
     public boolean isInCheckmate(TeamColor teamColor) {
         if (isInCheck(teamColor) && isInImpureStalemate(teamColor)) {
-            gameOver = true;
+            this.gameOver = true;
             return true;
         }
         return false;
@@ -155,7 +165,7 @@ public class ChessGame {
                 }
             }
         }
-        if (isInCheck(teamColor)) {
+        if (isInCheck(teamColor)) {  // Check if the king is in check
             return false;
         }
         return true;
@@ -174,7 +184,7 @@ public class ChessGame {
                 }
             }
         }
-        // NO isInCheck check here
+        // No check if the king is in check
         return true;
     }
 
