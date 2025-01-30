@@ -103,7 +103,14 @@ public class ChessGame {
         }
 
         board.removePiece(startPosition);
-        board.addPiece(endPosition, piece);
+
+        if (piece.getPieceType() == ChessPiece.PieceType.PAWN && move.getPromotionPiece() != null) {
+            ChessPiece newPiece = new ChessPiece(currentTurn, move.getPromotionPiece());
+            board.addPiece(endPosition, newPiece);
+        }
+        else {
+            board.addPiece(endPosition, piece);
+        }
 
         if (currentTurn == TeamColor.BLACK) {
             currentTurn = TeamColor.WHITE;
