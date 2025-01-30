@@ -129,7 +129,11 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        if (isInCheck(teamColor) && isInImpureStalemate(teamColor)) {
+            gameOver = true;
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -151,22 +155,27 @@ public class ChessGame {
                 }
             }
         }
+        if (isInCheck(teamColor)) {
+            return false;
+        }
         return true;
     }
 
-    /**
-     * Assess the position of a piece and return true if it is outside the board, else return false
-     *
-     * @param position the position to assess
-     */
-    public boolean isOutsideBoard(ChessPosition position) {
-        int row = position.getRow();
-        int column = position.getColumn();
 
-        if (row < 1 || row > 8 || column < 1 || column > 8) {
-            return true;
+    public boolean isInImpureStalemate(TeamColor teamColor) {
+        for (int i = 1; i <= 8; i++ ) {
+            for (int j = 1; j <= 8; j++ ) {
+                ChessPosition position = new ChessPosition(i, j);
+                ChessPiece piece = board.getPiece(position);
+                if (piece != null && piece.getTeamColor() == teamColor) {
+                    if (!validMoves(position).isEmpty()) {
+                        return false;
+                    }
+                }
+            }
         }
-        return false;
+        // NO isInCheck check here
+        return true;
     }
 
     /**
