@@ -13,11 +13,6 @@ public class ChessBoard {
     private ChessPiece[][] board = new ChessPiece[8][8];
 
     public ChessBoard() {
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                this.board[i][j] = null;
-            }
-        }
     }
 
     public void removePiece(ChessPosition position) {
@@ -50,7 +45,6 @@ public class ChessBoard {
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
-//        board = new ChessPiece[8][8];
         ChessPosition position;
         ChessPiece piece;
 
