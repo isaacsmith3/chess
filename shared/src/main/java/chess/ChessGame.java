@@ -164,8 +164,7 @@ public class ChessGame {
 
     /**
      * Determines if the given team is in stalemate, which here is defined as having
-     * no valid moves. This version of the stalemate checks to see if the king is also in check in order
-     * to account for some corner cases
+     * no valid moves (but also in check)
      *
      * @param teamColor which team to check for stalemate
      * @return True if the specified team is in stalemate, otherwise false
@@ -191,7 +190,7 @@ public class ChessGame {
 
     /**
      * Determines if the given team is in stalemate, which here is defined as having
-     * no valid moves
+     * no valid moves (but not in check)
      *
      * @param teamColor which team to check for stalemate
      * @return True if the specified team is in stalemate, otherwise false
