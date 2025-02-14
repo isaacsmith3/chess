@@ -18,12 +18,12 @@ public class UserService {
         this.authTokenDAO = authTokenDAO;
     }
 
-    public AuthData register(UserData request) {
+    public AuthData register(UserData request) throws DuplicateUserException {
 
         UserData existingUser = userDAO.getUser(request.username());
 
         if (existingUser != null) {
-            return null; // Some failed code should go here probably
+            throw new DuplicateUserException("Username already exists");
         }
 
         userDAO.createUser(request);
@@ -35,5 +35,13 @@ public class UserService {
 
         return authData;
     }
+
+    // Custom exception
+    public class DuplicateUserException extends Exception {
+        public DuplicateUserException(String message) {
+            super(message);
+        }
+    }
+
 
 }
