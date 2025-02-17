@@ -18,6 +18,12 @@ public class Server {
 
         // Register your endpoints and handle exceptions here.
         try {
+            Spark.delete("/db", (request, response) -> {
+                userDAO.clear();
+                authTokenDAO.clearAuth();
+                response.status(200);
+                return "";
+            });
             Spark.post("/user", (request, response) -> (new RegisterHandler(userDAO, authTokenDAO).register(request, response)));
 
         } catch (Exception e) {
@@ -26,7 +32,6 @@ public class Server {
 
         //This line initializes the server and can be removed once you have a functioning endpoint
         Spark.init();
-
         Spark.awaitInitialization();
         return Spark.port();
     }

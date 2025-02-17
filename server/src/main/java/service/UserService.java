@@ -3,6 +3,7 @@ package service;
 import dataaccess.AuthTokenDAO;
 import dataaccess.MemoryAuthTokenDAO;
 import dataaccess.UserDAO;
+import endpoint.RegisterResult;
 import model.AuthData;
 import model.UserData;
 import java.util.UUID;
@@ -18,7 +19,11 @@ public class UserService {
         this.authTokenDAO = authTokenDAO;
     }
 
-    public AuthData register(UserData request) throws DuplicateUserException {
+    public RegisterResult register(UserData request) throws DuplicateUserException {
+
+        if (request.username() == null || request.password() == null) {
+            throw new IllegalArgumentException("Missing required fields");
+        }
 
         UserData existingUser = userDAO.getUser(request.username());
 
@@ -33,7 +38,9 @@ public class UserService {
 
         authTokenDAO.createAuth(authData);
 
-        return authData;
+        RegisterResult rr = new RegisterResult(request.username(), authData.authToken());
+
+        return rr;
     }
 
     // Custom exception

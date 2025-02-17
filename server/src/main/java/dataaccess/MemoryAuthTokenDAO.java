@@ -24,4 +24,9 @@ public class MemoryAuthTokenDAO implements AuthTokenDAO {
                 "authDataCollection=" + authDataCollection +
                 '}';
     }
+
+    @Override
+    public void clearAuth() {
+        authDataCollection.clear();
+    }
 }
