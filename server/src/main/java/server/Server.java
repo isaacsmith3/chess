@@ -4,6 +4,7 @@ import dataaccess.MemoryAuthTokenDAO;
 import dataaccess.MemoryUserDAO;
 import dataaccess.UserDAO;
 import handler.LoginHandler;
+import handler.LogoutHandler;
 import handler.RegisterHandler;
 import spark.*;
 
@@ -27,6 +28,7 @@ public class Server {
             });
             Spark.post("/user", (request, response) -> (new RegisterHandler(userDAO, authTokenDAO).register(request, response)));
             Spark.post("/session", (request, response) -> (new LoginHandler(userDAO, authTokenDAO).login(request, response)));
+            Spark.delete("/session", (request, response) -> (new LogoutHandler(userDAO, authTokenDAO).logout(request, response)));
 
         } catch (Exception e) {
             throw new RuntimeException(e);

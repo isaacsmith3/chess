@@ -67,6 +67,13 @@ public class UserService {
 
     }
 
+    public void logout(String auth) throws InvalidCredentialsException {
+        String removedAuth = authTokenDAO.deleteAuth(auth);
+        if (removedAuth == null) {
+            throw new InvalidCredentialsException("Auth token does not exist");
+        }
+    }
+
 
     // Custom exceptions
     public class DuplicateUserException extends Exception {

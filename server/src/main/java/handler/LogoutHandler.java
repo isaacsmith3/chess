@@ -3,28 +3,26 @@ package handler;
 import com.google.gson.Gson;
 import dataaccess.AuthTokenDAO;
 import dataaccess.UserDAO;
-import endpoint.AuthResult;
-import model.UserData;
+import model.AuthData;
+import service.UserService;
 import spark.Request;
 import spark.Response;
-import service.UserService;
 
 import java.util.Map;
 
-public class LoginHandler {
-
+public class LogoutHandler {
     private final UserService userService;
 
-    public LoginHandler(UserDAO userDAO, AuthTokenDAO authTokenDAO) {
+    public LogoutHandler(UserDAO userDAO, AuthTokenDAO authTokenDAO) {
         this.userService = new UserService(userDAO, authTokenDAO);
     }
 
-    public Object login(Request request, Response response) {
+    public Object logout(Request request, Response response) {
         try {
-            var user = new Gson().fromJson(request.body(), UserData.class);
-            AuthResult loginResult = userService.login(user);
+            String auth = request.headers("authorization");
+            userService.logout(auth);
             response.status(200);
-            return new Gson().toJson(loginResult);
+            return "";
         } catch (Exception e) {
             if (e instanceof UserService.InvalidCredentialsException) {
                 response.status(401); // Unauthorized
@@ -36,7 +34,5 @@ public class LoginHandler {
                     "success", false
             ));
         }
-
     }
-
 }
