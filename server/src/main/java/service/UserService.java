@@ -1,13 +1,11 @@
 package service;
 
 import dataaccess.AuthTokenDAO;
-import dataaccess.MemoryAuthTokenDAO;
 import dataaccess.UserDAO;
-import endpoint.RegisterResult;
+import endpoint.AuthResult;
 import model.AuthData;
 import model.UserData;
 import java.util.UUID;
-
 
 public class UserService {
 
@@ -19,7 +17,7 @@ public class UserService {
         this.authTokenDAO = authTokenDAO;
     }
 
-    public RegisterResult register(UserData request) throws DuplicateUserException {
+    public AuthResult register(UserData request) throws DuplicateUserException {
 
         if (request.username() == null || request.password() == null) {
             throw new IllegalArgumentException("Missing required fields");
@@ -38,17 +36,47 @@ public class UserService {
 
         authTokenDAO.createAuth(authData);
 
-        RegisterResult rr = new RegisterResult(request.username(), authData.authToken());
+        AuthResult rr = new AuthResult(request.username(), authData.authToken());
 
         return rr;
     }
 
-    // Custom exception
+    public AuthResult login(UserData request) throws InvalidCredentialsException {
+        if (request.username() == null || request.password() == null) {
+            throw new IllegalArgumentException("Missing required fields");
+        }
+
+        UserData existingUser = userDAO.getUser(request.username());
+
+        if (existingUser == null) {
+            throw new InvalidCredentialsException("Username not found");
+        }
+
+        if (!request.password().equals(existingUser.password())) {
+            throw new InvalidCredentialsException("Passwords do not match");
+        }
+
+        String authToken = UUID.randomUUID().toString();
+        AuthData authData = new AuthData(authToken, request.username());
+
+        authTokenDAO.createAuth(authData);
+
+        AuthResult rr = new AuthResult(request.username(), authData.authToken());
+
+        return rr;
+
+    }
+
+
+    // Custom exceptions
     public class DuplicateUserException extends Exception {
         public DuplicateUserException(String message) {
             super(message);
         }
     }
 
+    public class InvalidCredentialsException extends Exception {
+        public InvalidCredentialsException(String message) { super(message); }
+    }
 
 }

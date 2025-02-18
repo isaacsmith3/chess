@@ -3,7 +3,7 @@ package handler;
 import com.google.gson.Gson;
 import dataaccess.AuthTokenDAO;
 import dataaccess.UserDAO;
-import endpoint.RegisterResult;
+import endpoint.AuthResult;
 import model.UserData;
 import service.UserService;
 import spark.Request;
@@ -22,7 +22,7 @@ public class RegisterHandler {
     public Object register(Request request, Response response) {
         try {
             var user = new Gson().fromJson(request.body(), UserData.class);
-            RegisterResult registerResult = userService.register(user);
+            AuthResult registerResult = userService.register(user);
             response.status(200);
             return new Gson().toJson(registerResult);
 
