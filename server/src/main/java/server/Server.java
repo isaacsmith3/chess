@@ -20,9 +20,11 @@ public class Server {
             Spark.delete("/db", (request, response) -> {
                 userDAO.clear();
                 authTokenDAO.clearAuth();
+                gameDAO.clear();
                 response.status(200);
                 return "";
             });
+            Spark.delete("/db", (request, response) -> (new ClearHandler(userDAO, authTokenDAO, gameDAO).clear(request, response)));
             Spark.post("/user", (request, response) -> (new RegisterHandler(userDAO, authTokenDAO).register(request, response)));
             Spark.post("/session", (request, response) -> (new LoginHandler(userDAO, authTokenDAO).login(request, response)));
             Spark.delete("/session", (request, response) -> (new LogoutHandler(userDAO, authTokenDAO).logout(request, response)));

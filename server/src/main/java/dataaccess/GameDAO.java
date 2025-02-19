@@ -12,4 +12,5 @@ public interface GameDAO {
     GameData getGame(JoinGameRequest gameRequest);
     void joinGame(GameData updatedGame);
     Collection<ListGamesResult> getGames();
+    void clear();
 }

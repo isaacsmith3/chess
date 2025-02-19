@@ -50,4 +50,9 @@ public class MemoryAuthTokenDAO implements AuthTokenDAO {
         }
         return null;
     }
+
+    @Override
+    public void clear() {
+        authDataCollection.clear();
+    }
 }

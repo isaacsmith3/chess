@@ -54,5 +54,10 @@ public class MemoryGameDAO implements GameDAO {
         return gameDataCollection.stream().map(game -> new ListGamesResult(game.gameId(), game.whiteUsername(), game.blackUsername(), game.gameName())).collect(Collectors.toList());
     }
 
+    @Override
+    public void clear() {
+        gameDataCollection.clear();
+    }
+
 
 }

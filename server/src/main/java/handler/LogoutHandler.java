@@ -3,7 +3,6 @@ package handler;
 import com.google.gson.Gson;
 import dataaccess.AuthTokenDAO;
 import dataaccess.UserDAO;
-import model.AuthData;
 import service.UserService;
 import spark.Request;
 import spark.Response;
