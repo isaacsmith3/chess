@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import dataaccess.AuthTokenDAO;
 import dataaccess.GameDAO;
 import endpoint.JoinGameRequest;
-import model.GameData;
 import service.GameService;
 import spark.Request;
 import spark.Response;
@@ -26,7 +25,7 @@ public class JoinGameHandler {
             return "";
         } catch (Exception e) {
             if (e instanceof GameService.InvalidAuthTokenException) {
-                response.status(401); // Unauthorized
+                response.status(401);
             } else if (e instanceof GameService.InvalidGameException) {
                 response.status(403);
             }

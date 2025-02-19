@@ -1,11 +1,11 @@
 package endpoint;
 
-public class GameResult {
+public class CreateGameResult {
     private Integer gameID;
 
-    public GameResult() {}
+    public CreateGameResult() {}
 
-    public GameResult(Integer gameID) {
+    public CreateGameResult(Integer gameID) {
         this.gameID = gameID;
     }
 

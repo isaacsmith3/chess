@@ -2,11 +2,14 @@ package service;
 
 import dataaccess.AuthTokenDAO;
 import dataaccess.GameDAO;
-import endpoint.GameResult;
+import endpoint.CreateGameResult;
 import endpoint.JoinGameRequest;
+import endpoint.ListGamesResult;
 import model.AuthData;
 import model.GameData;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 
 public class GameService {
@@ -19,7 +22,7 @@ public class GameService {
     }
 
 
-    public GameResult createGame(String authToken, String gameName) throws InvalidAuthTokenException {
+    public CreateGameResult createGame(String authToken, String gameName) throws InvalidAuthTokenException {
         AuthData verifiedAuth = authTokenDAO.verifyAuth(authToken);
 
         if (verifiedAuth == null) {
@@ -64,7 +67,15 @@ public class GameService {
         }
 
         gameDAO.joinGame(updatedGame);
+    }
 
+    public Collection<ListGamesResult> listGames(String authToken) throws InvalidAuthTokenException {
+        AuthData verifiedAuth = authTokenDAO.verifyAuth(authToken);
+        if (verifiedAuth == null) {
+            throw new InvalidAuthTokenException("Invalid auth token");
+        }
+        Collection<ListGamesResult> games = gameDAO.getGames();
+        return games;
     }
 
     public class InvalidAuthTokenException extends Exception {

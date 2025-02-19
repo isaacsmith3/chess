@@ -3,31 +3,30 @@ package handler;
 import com.google.gson.Gson;
 import dataaccess.AuthTokenDAO;
 import dataaccess.GameDAO;
-import endpoint.CreateGameResult;
+import endpoint.ListGamesResult;
 import model.GameData;
 import service.GameService;
 import spark.Request;
 import spark.Response;
 
+import java.util.Collection;
 import java.util.Map;
 
-public class CreateGameHandler {
+public class ListGamesHandler {
     private final GameService gameService;
 
-    public CreateGameHandler(GameDAO gameDAO, AuthTokenDAO authTokenDAO) {
+    public ListGamesHandler(GameDAO gameDAO, AuthTokenDAO authTokenDAO) {
         this.gameService = new GameService(gameDAO, authTokenDAO);
     }
 
-    public Object createGame(Request request, Response response) {
+    public Object listGames(Request request, Response response) {
         try {
             String authToken = request.headers("authorization");
-            String gameName = new Gson().fromJson(request.body(), GameData.class).gameName();
-            CreateGameResult createGameResult = gameService.createGame(authToken, gameName);
-            response.status(200);
-            return new Gson().toJson(createGameResult);
+            Collection<ListGamesResult> games = gameService.listGames(authToken);
+            return new Gson().toJson(Map.of("games", games));
         } catch (Exception e) {
             if (e instanceof GameService.InvalidAuthTokenException) {
-                response.status(401); // Unauthorized
+                response.status(401);
             } else {
                 response.status(400);
             }
@@ -37,6 +36,4 @@ public class CreateGameHandler {
             ));
         }
     }
-
-
 }

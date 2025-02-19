@@ -1,13 +1,15 @@
 package dataaccess;
 
 import chess.ChessGame;
-import endpoint.GameResult;
+import endpoint.CreateGameResult;
 import endpoint.JoinGameRequest;
+import endpoint.ListGamesResult;
 import model.GameData;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 public class MemoryGameDAO implements GameDAO {
 
@@ -19,11 +21,11 @@ public class MemoryGameDAO implements GameDAO {
     }
 
     @Override
-    public GameResult createGame(String gameName) {
+    public CreateGameResult createGame(String gameName) {
         int newGameId = gameIdCounter.getAndIncrement();
         GameData game = new GameData(newGameId, null, null, gameName, new ChessGame());
         gameDataCollection.add(game);
-        return new GameResult(newGameId);
+        return new CreateGameResult(newGameId);
     }
 
     @Override
@@ -45,6 +47,11 @@ public class MemoryGameDAO implements GameDAO {
                 return;
             }
         }
+    }
+
+    @Override
+    public Collection<ListGamesResult> getGames() {
+        return gameDataCollection.stream().map(game -> new ListGamesResult(game.gameId(), game.whiteUsername(), game.blackUsername(), game.gameName())).collect(Collectors.toList());
     }
 
 
