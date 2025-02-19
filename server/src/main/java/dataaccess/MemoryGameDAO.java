@@ -2,6 +2,7 @@ package dataaccess;
 
 import chess.ChessGame;
 import endpoint.GameResult;
+import endpoint.JoinGameRequest;
 import model.GameData;
 
 import java.util.ArrayList;
@@ -24,4 +25,27 @@ public class MemoryGameDAO implements GameDAO {
         gameDataCollection.add(game);
         return new GameResult(newGameId);
     }
+
+    @Override
+    public GameData getGame(JoinGameRequest gameRequest) {
+        for (GameData game : gameDataCollection) {
+            if (game.gameId() == gameRequest.getGameId()) {
+                return game;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public void joinGame(GameData updatedGame) {
+        for (GameData game : gameDataCollection) {
+            if (game.gameId() == updatedGame.gameId()) {
+                gameDataCollection.remove(game);
+                gameDataCollection.add(updatedGame);
+                return;
+            }
+        }
+    }
+
+
 }

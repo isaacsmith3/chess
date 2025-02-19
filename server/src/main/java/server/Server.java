@@ -1,10 +1,7 @@
 package server;
 
 import dataaccess.*;
-import handler.CreateGameHandler;
-import handler.LoginHandler;
-import handler.LogoutHandler;
-import handler.RegisterHandler;
+import handler.*;
 import spark.*;
 
 public class Server {
@@ -31,6 +28,7 @@ public class Server {
             Spark.delete("/session", (request, response) -> (new LogoutHandler(userDAO, authTokenDAO).logout(request, response)));
 
             Spark.post("/game", (request, response) -> (new CreateGameHandler(gameDAO, authTokenDAO).createGame(request, response)));
+            Spark.put("/game", (request, response) -> (new JoinGameHandler(gameDAO, authTokenDAO).joinGame(request, response)));
 
         } catch (Exception e) {
             throw new RuntimeException(e);

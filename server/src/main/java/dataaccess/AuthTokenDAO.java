@@ -6,5 +6,5 @@ public interface AuthTokenDAO {
     void createAuth(AuthData authData);
     void clearAuth();
     String deleteAuth(String auth);
-    boolean verifyAuth(String auth);
+    AuthData verifyAuth(String auth);
 }

@@ -3,6 +3,11 @@ package service;
 import dataaccess.AuthTokenDAO;
 import dataaccess.GameDAO;
 import endpoint.GameResult;
+import endpoint.JoinGameRequest;
+import model.AuthData;
+import model.GameData;
+
+import java.util.Objects;
 
 public class GameService {
     private GameDAO gameDAO;
@@ -14,19 +19,74 @@ public class GameService {
     }
 
 
-
     public GameResult createGame(String authToken, String gameName) throws InvalidAuthTokenException {
-        boolean verifiedAuth = authTokenDAO.verifyAuth(authToken);
-        if (!verifiedAuth) {
+        AuthData verifiedAuth = authTokenDAO.verifyAuth(authToken);
+
+        if (verifiedAuth == null) {
             throw new InvalidAuthTokenException("Invalid auth token");
         }
 
-        GameResult gameResult = gameDAO.createGame(gameName);
-        return gameResult;
+        return gameDAO.createGame(gameName);
+    }
+
+    public void joinGame(String authToken, JoinGameRequest gameRequest) throws InvalidAuthTokenException, InvalidGameException, InvalidCredentialsException, InvalidGameRequestException {
+        AuthData verifiedAuth = authTokenDAO.verifyAuth(authToken);
+        String playerColor = gameRequest.getPlayerColor();
+
+        if (verifiedAuth == null) {
+            throw new InvalidAuthTokenException("Invalid auth token");
+        }
+
+        GameData game = gameDAO.getGame(gameRequest);
+
+        if (game == null) {
+            throw new InvalidGameRequestException("Game does not exist");
+        }
+
+        GameData updatedGame;
+
+        if (Objects.equals(playerColor, "WHITE")) {
+            if (game.whiteUsername() == null) {
+                updatedGame = new GameData(game.gameId(), verifiedAuth.userName(), game.blackUsername(), game.gameName(), game.game());
+            } else {
+                throw new InvalidGameException("White player already exists");
+            }
+        }
+        else if (Objects.equals(playerColor, "BLACK")) {
+            if (game.blackUsername() == null) {
+                updatedGame = new GameData(game.gameId(), game.whiteUsername(), verifiedAuth.userName(), game.gameName(), game.game());
+            }
+            else {
+                throw new InvalidGameException("Black player already exists");
+            }
+        } else {
+            throw new InvalidCredentialsException("Team color must be WHITE or BLACk");
+        }
+
+        gameDAO.joinGame(updatedGame);
+
     }
 
     public class InvalidAuthTokenException extends Exception {
         public InvalidAuthTokenException(String message) {
+            super(message);
+        }
+    }
+
+    public class InvalidGameException extends Exception {
+        public InvalidGameException(String message) {
+            super(message);
+        }
+    }
+
+    public class InvalidCredentialsException extends Exception {
+        public InvalidCredentialsException(String message) {
+            super(message);
+        }
+    }
+
+    public class InvalidGameRequestException extends Exception {
+        public InvalidGameRequestException(String message) {
             super(message);
         }
     }
