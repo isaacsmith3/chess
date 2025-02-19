@@ -2,7 +2,7 @@ package service;
 
 import dataaccess.AuthTokenDAO;
 import dataaccess.UserDAO;
-import endpoint.AuthResult;
+import types.AuthResult;
 import model.AuthData;
 import model.UserData;
 import java.util.UUID;

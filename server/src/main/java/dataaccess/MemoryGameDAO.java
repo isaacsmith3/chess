@@ -1,9 +1,9 @@
 package dataaccess;
 
 import chess.ChessGame;
-import endpoint.CreateGameResult;
-import endpoint.JoinGameRequest;
-import endpoint.ListGamesResult;
+import types.CreateGameResult;
+import types.JoinGameRequest;
+import types.ListGamesResult;
 import model.GameData;
 
 import java.util.ArrayList;
@@ -31,7 +31,7 @@ public class MemoryGameDAO implements GameDAO {
     @Override
     public GameData getGame(JoinGameRequest gameRequest) {
         for (GameData game : gameDataCollection) {
-            if (game.gameId() == gameRequest.getGameId()) {
+            if (game.gameId() == gameRequest.gameID()) {
                 return game;
             }
         }

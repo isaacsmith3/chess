@@ -1,8 +1,8 @@
 package dataaccess;
 
-import endpoint.CreateGameResult;
-import endpoint.JoinGameRequest;
-import endpoint.ListGamesResult;
+import types.CreateGameResult;
+import types.JoinGameRequest;
+import types.ListGamesResult;
 import model.GameData;
 
 import java.util.Collection;
