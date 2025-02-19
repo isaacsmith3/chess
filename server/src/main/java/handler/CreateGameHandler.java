@@ -6,6 +6,7 @@ import dataaccess.GameDAO;
 import endpoint.GameResult;
 import model.GameData;
 import service.GameService;
+import service.UserService;
 import spark.Request;
 import spark.Response;
 
@@ -26,7 +27,11 @@ public class CreateGameHandler {
             response.status(200);
             return new Gson().toJson(gameResult);
         } catch (Exception e) {
-            response.status(500);
+            if (e instanceof GameService.InvalidAuthTokenException) {
+                response.status(401); // Unauthorized
+            } else {
+                response.status(400);
+            }
             return new Gson().toJson(Map.of(
                     "message", "Error: " + e.getMessage(),
                     "success", false
