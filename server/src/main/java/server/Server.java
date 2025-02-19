@@ -1,8 +1,7 @@
 package server;
 
-import dataaccess.MemoryAuthTokenDAO;
-import dataaccess.MemoryUserDAO;
-import dataaccess.UserDAO;
+import dataaccess.*;
+import handler.CreateGameHandler;
 import handler.LoginHandler;
 import handler.LogoutHandler;
 import handler.RegisterHandler;
@@ -17,6 +16,7 @@ public class Server {
 
         MemoryAuthTokenDAO authTokenDAO = new MemoryAuthTokenDAO();
         UserDAO userDAO = new MemoryUserDAO();
+        GameDAO gameDAO = new MemoryGameDAO();
 
         // Register your endpoints and handle exceptions here.
         try {
@@ -29,6 +29,8 @@ public class Server {
             Spark.post("/user", (request, response) -> (new RegisterHandler(userDAO, authTokenDAO).register(request, response)));
             Spark.post("/session", (request, response) -> (new LoginHandler(userDAO, authTokenDAO).login(request, response)));
             Spark.delete("/session", (request, response) -> (new LogoutHandler(userDAO, authTokenDAO).logout(request, response)));
+
+            Spark.post("/game", (request, response) -> (new CreateGameHandler(gameDAO, authTokenDAO).createGame(request, response)));
 
         } catch (Exception e) {
             throw new RuntimeException(e);

@@ -1,4 +1,8 @@
 package dataaccess;
 
-public class GameDAO {
+import endpoint.GameResult;
+
+public interface GameDAO {
+    GameResult createGame(String gameName);
+
 }

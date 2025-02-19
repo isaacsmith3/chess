@@ -19,8 +19,8 @@ public class LogoutHandler {
 
     public Object logout(Request request, Response response) {
         try {
-            String auth = request.headers("authorization");
-            userService.logout(auth);
+            String authToken = request.headers("authorization");
+            userService.logout(authToken);
             response.status(200);
             return "";
         } catch (Exception e) {
