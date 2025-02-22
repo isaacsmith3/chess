@@ -4,8 +4,11 @@ package dataaccess;
 
 import model.UserData;
 
+import java.util.Collection;
+
 public interface UserDAO {
     void createUser(UserData userData);
     UserData getUser(String userName);
     void clear();
+    Collection<UserData> getAllUsers();
 }

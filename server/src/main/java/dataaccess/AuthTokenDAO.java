@@ -8,4 +8,5 @@ public interface AuthTokenDAO {
     String deleteAuth(String auth);
     AuthData verifyAuth(String auth);
     void clear();
+    Object getAuthDataCollection();
 }

@@ -8,6 +8,7 @@ import model.GameData;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -57,6 +58,11 @@ public class MemoryGameDAO implements GameDAO {
     @Override
     public void clear() {
         gameDataCollection.clear();
+    }
+
+    @Override
+    public Collection<GameData> getAllGames() {
+        return gameDataCollection;
     }
 
 

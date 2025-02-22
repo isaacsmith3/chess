@@ -40,4 +40,9 @@ public class MemoryUserDAO implements UserDAO {
     public void clear() {
         userDataCollection.clear();
     }
+
+    @Override
+    public Collection<UserData> getAllUsers() {
+        return userDataCollection;
+    }
 }

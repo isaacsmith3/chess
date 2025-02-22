@@ -20,7 +20,6 @@ public class GameService {
         this.authTokenDAO = authTokenDAO;
     }
 
-
     public CreateGameResult createGame(String authToken, String gameName) throws InvalidAuthTokenException {
         AuthData verifiedAuth = authTokenDAO.verifyAuth(authToken);
 

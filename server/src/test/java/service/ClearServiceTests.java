@@ -1,0 +1,61 @@
+package service;
+
+import dataaccess.*;
+import model.AuthData;
+import model.GameData;
+import model.UserData;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.util.Collection;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+public class ClearServiceTests {
+
+    public ClearService clearService;
+    public UserDAO userDAO = new MemoryUserDAO();
+    public GameDAO gameDAO = new MemoryGameDAO();
+    public AuthTokenDAO authTokenDAO = new MemoryAuthTokenDAO();
+
+    @BeforeEach
+    public void setUp() {
+        this.clearService = new ClearService(this.userDAO, this.authTokenDAO, this.gameDAO);
+    }
+
+    @Test
+    public void emptyDatabase() throws DataAccessException {
+        clearService.clear();
+        Collection<AuthData> authDataCollection = (Collection<AuthData>) authTokenDAO.getAuthDataCollection();
+        assertTrue(authDataCollection.isEmpty());
+    }
+
+    @Test
+    public void fullDatabase() throws DataAccessException {
+        clearService.userDAO.createUser(new UserData("isaac", "smith", "1234"));
+        clearService.userDAO.createUser(new UserData("shane", "reese", "6789"));
+        Collection<UserData> userDataCollection = userDAO.getAllUsers();
+        assertTrue(userDataCollection.size() == 2);
+
+        clearService.gameDAO.createGame("game 1");
+        clearService.gameDAO.createGame("game 2");
+        clearService.gameDAO.createGame("game 3");
+        Collection<GameData> gameDataCollection = gameDAO.getAllGames();
+        assertTrue(gameDataCollection.size() == 3);
+
+        clearService.clear();
+        userDataCollection = userDAO.getAllUsers();
+        assertTrue(userDataCollection.size() == 0);
+        assertTrue(gameDataCollection.size() == 0);
+    }
+
+    @Test
+    public void noClear() throws DataAccessException {
+        // This the clear method can't really fail
+        clearService.clear();
+        clearService.userDAO.createUser(new UserData("isaac", "smith", "1234"));
+        clearService.userDAO.createUser(new UserData("shane", "reese", "6789"));
+        Collection<UserData> userDataCollection = userDAO.getAllUsers();
+        assertTrue(userDataCollection.size() == 2);
+    }
+}

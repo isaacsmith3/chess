@@ -9,6 +9,11 @@ public class MemoryAuthTokenDAO implements AuthTokenDAO {
 
     private Collection<AuthData> authDataCollection;
 
+    @Override
+    public Collection<AuthData> getAuthDataCollection() {
+        return authDataCollection;
+    }
+
     public MemoryAuthTokenDAO() {
         this.authDataCollection = new ArrayList<>();
     }

@@ -36,9 +36,7 @@ public class UserService {
 
         authTokenDAO.createAuth(authData);
 
-        AuthResult rr = new AuthResult(request.username(), authData.authToken());
-
-        return rr;
+        return new AuthResult(request.username(), authData.authToken());
     }
 
     public AuthResult login(UserData request) throws InvalidCredentialsException {
@@ -61,9 +59,7 @@ public class UserService {
 
         authTokenDAO.createAuth(authData);
 
-        AuthResult rr = new AuthResult(request.username(), authData.authToken());
-
-        return rr;
+        return new AuthResult(request.username(), authData.authToken());
 
     }
 
@@ -73,7 +69,6 @@ public class UserService {
             throw new InvalidCredentialsException("Auth token does not exist");
         }
     }
-
 
     // Custom exceptions
     public class DuplicateUserException extends Exception {
