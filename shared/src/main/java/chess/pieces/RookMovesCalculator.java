@@ -22,7 +22,7 @@ public class RookMovesCalculator implements PieceMovesCalculator {
         // up
         for (int i = row+1; i <= 8; i++) {
             ChessPosition newPosition = new ChessPosition(i, col);
-            if (loopRook(board, myPosition, newPosition, moves)) {
+            if (loop(board, myPosition, newPosition, moves)) {
                 break;
             }
         }
@@ -30,7 +30,7 @@ public class RookMovesCalculator implements PieceMovesCalculator {
         // down
         for (int i = row-1; i >= 1; i--) {
             ChessPosition newPosition = new ChessPosition(i, col);
-            if (loopRook(board, myPosition, newPosition, moves)) {
+            if (loop(board, myPosition, newPosition, moves)) {
                 break;
             }
         }
@@ -38,7 +38,7 @@ public class RookMovesCalculator implements PieceMovesCalculator {
         // left
         for (int i = col-1; i >= 1; i--) {
             ChessPosition newPosition = new ChessPosition(row, i);
-            if (loopRook(board, myPosition, newPosition, moves)) {
+            if (loop(board, myPosition, newPosition, moves)) {
                 break;
             }
         }
@@ -46,20 +46,11 @@ public class RookMovesCalculator implements PieceMovesCalculator {
         // right
         for (int i = col+1; i <= 8; i++) {
             ChessPosition newPosition = new ChessPosition(row, i);
-            if (loopRook(board, myPosition, newPosition, moves)) {
+            if (loop(board, myPosition, newPosition, moves)) {
                 break;
             }
         }
 
         return moves;
-    }
-
-    private boolean loopRook(ChessBoard board, ChessPosition myPosition, ChessPosition newPosition, Collection<ChessMove> moves) {
-        ChessMove newMove = new ChessMove(myPosition, newPosition, null);
-        if ((!validMove(newMove, myPosition, newPosition, board, moves))) {
-            return true;
-        }
-        moves.add(newMove);
-        return false;
     }
 }

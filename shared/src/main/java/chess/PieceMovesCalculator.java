@@ -36,4 +36,13 @@ public interface PieceMovesCalculator {
         return true;
     }
 
+    default boolean loop(ChessBoard board, ChessPosition myPosition, ChessPosition newPosition, Collection<ChessMove> moves) {
+        ChessMove newMove = new ChessMove(myPosition, newPosition, null);
+        if ((!validMove(newMove, myPosition, newPosition, board, moves))) {
+            return true;
+        }
+        moves.add(newMove);
+        return false;
+    }
+
 }
