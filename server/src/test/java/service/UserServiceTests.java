@@ -52,7 +52,7 @@ public class UserServiceTests {
 
         userService.logout(auth);
         authDataCollection = (Collection<AuthData>) authTokenDAO.getAuthDataCollection();
-        assertTrue(authDataCollection.size() == 0);
+        assertTrue(authDataCollection.isEmpty());
     }
 
     @Test public void negativeTestLogout() throws UserService.InvalidCredentialsException, UserService.DuplicateUserException {
@@ -79,7 +79,7 @@ public class UserServiceTests {
 
         userService.logout(auth);
         authDataCollection = (Collection<AuthData>) authTokenDAO.getAuthDataCollection();
-        assertTrue(authDataCollection.size() == 0);
+        assertTrue(authDataCollection.isEmpty());
 
         userService.login(new UserData("isaac", "password", "email"));
         authDataCollection = (Collection<AuthData>) authTokenDAO.getAuthDataCollection();
@@ -100,7 +100,7 @@ public class UserServiceTests {
 
         userService.logout(auth);
         authDataCollection = (Collection<AuthData>) authTokenDAO.getAuthDataCollection();
-        assertTrue(authDataCollection.size() == 0);
+        assertTrue(authDataCollection.isEmpty());
 
         assertThrows(UserService.InvalidCredentialsException.class, () -> {
             userService.login(new UserData("isaac", "1234", "email"));

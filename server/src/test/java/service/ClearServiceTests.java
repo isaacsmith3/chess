@@ -45,13 +45,12 @@ public class ClearServiceTests {
 
         clearService.clear();
         userDataCollection = userDAO.getAllUsers();
-        assertTrue(userDataCollection.size() == 0);
-        assertTrue(gameDataCollection.size() == 0);
+        assertTrue(userDataCollection.isEmpty());
+        assertTrue(gameDataCollection.isEmpty());
     }
 
     @Test
     public void noClear() throws DataAccessException {
-        // This the clear method can't really fail
         clearService.clear();
         clearService.userDAO.createUser(new UserData("isaac", "smith", "1234"));
         clearService.userDAO.createUser(new UserData("shane", "reese", "6789"));
