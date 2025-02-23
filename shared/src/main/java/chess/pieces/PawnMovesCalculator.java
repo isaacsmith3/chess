@@ -87,7 +87,8 @@ public class PawnMovesCalculator implements PieceMovesCalculator {
     private void leftAttack(ChessBoard board, ChessPosition myPosition,
                             Collection<ChessMove> moves, boolean promotion, ChessPosition attackLeft) {
         ChessMove leftMove = new ChessMove(myPosition, attackLeft, null);
-        if (!outsideBoard(attackLeft) && board.getPiece(attackLeft) != null && board.getPiece(attackLeft).getTeamColor() == ChessGame.TeamColor.WHITE) {
+        if (!outsideBoard(attackLeft) && board.getPiece(attackLeft) != null
+                && board.getPiece(attackLeft).getTeamColor() == ChessGame.TeamColor.WHITE) {
             left(myPosition, moves, promotion, attackLeft, leftMove);
         }
     }
@@ -111,7 +112,8 @@ public class PawnMovesCalculator implements PieceMovesCalculator {
     private void attackLeft(ChessBoard board, ChessPosition myPosition,
                             Collection<ChessMove> moves, boolean promotion, ChessPosition attackLeft) {
         ChessMove leftMove = new ChessMove(myPosition, attackLeft, null);
-        if (!outsideBoard(attackLeft) && board.getPiece(attackLeft) != null && board.getPiece(attackLeft).getTeamColor() == ChessGame.TeamColor.BLACK) {
+        if (!outsideBoard(attackLeft) && board.getPiece(attackLeft) != null &&
+                board.getPiece(attackLeft).getTeamColor() == ChessGame.TeamColor.BLACK) {
             left(myPosition, moves, promotion, attackLeft, leftMove);
         }
     }

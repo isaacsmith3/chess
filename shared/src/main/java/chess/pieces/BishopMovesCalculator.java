@@ -21,7 +21,7 @@ public class BishopMovesCalculator implements PieceMovesCalculator {
         for (int i = row+1; i <= 8; i++) {
             j++;
             ChessPosition newPosition = new ChessPosition(i, j);
-            if (loop(board, myPosition, newPosition, moves)) {
+            if (loopBishop(board, myPosition, newPosition, moves)) {
                 break;
             }
         }
@@ -31,7 +31,7 @@ public class BishopMovesCalculator implements PieceMovesCalculator {
         for (int i = row+1; i <= 8; i++) {
             j--;
             ChessPosition newPosition = new ChessPosition(i, j);
-            if (loop(board, myPosition, newPosition, moves)) {
+            if (loopBishop(board, myPosition, newPosition, moves)) {
                 break;
             }
         }
@@ -41,7 +41,7 @@ public class BishopMovesCalculator implements PieceMovesCalculator {
         for (int i = row-1; i >= 1; i--) {
             j++;
             ChessPosition newPosition = new ChessPosition(i, j);
-            if (loop(board, myPosition, newPosition, moves)) {
+            if (loopBishop(board, myPosition, newPosition, moves)) {
                 break;
             }
         }
@@ -51,7 +51,7 @@ public class BishopMovesCalculator implements PieceMovesCalculator {
         for (int i = row-1; i >= 1; i--) {
             j--;
             ChessPosition newPosition = new ChessPosition(i, j);
-            if (loop(board, myPosition, newPosition, moves)) {
+            if (loopBishop(board, myPosition, newPosition, moves)) {
                 break;
             }
         }
@@ -59,7 +59,7 @@ public class BishopMovesCalculator implements PieceMovesCalculator {
         return moves;
     }
 
-    private boolean loop(ChessBoard board, ChessPosition myPosition, ChessPosition newPosition, Collection<ChessMove> moves) {
+    private boolean loopBishop(ChessBoard board, ChessPosition myPosition, ChessPosition newPosition, Collection<ChessMove> moves) {
         ChessMove newMove = new ChessMove(myPosition, newPosition, null);
         if ((!validMove(newMove, myPosition, newPosition, board, moves))) {
             return true;
