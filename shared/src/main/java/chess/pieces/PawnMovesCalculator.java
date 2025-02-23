@@ -84,14 +84,16 @@ public class PawnMovesCalculator implements PieceMovesCalculator {
         return moves;
     }
 
-    private void leftAttack(ChessBoard board,ChessPosition myPosition,Collection<ChessMove> moves,boolean promotion,ChessPosition attackLeft) {
+    private void leftAttack(ChessBoard board, ChessPosition myPosition,
+                            Collection<ChessMove> moves, boolean promotion, ChessPosition attackLeft) {
         ChessMove leftMove = new ChessMove(myPosition, attackLeft, null);
         if (!outsideBoard(attackLeft) && board.getPiece(attackLeft) != null && board.getPiece(attackLeft).getTeamColor() == ChessGame.TeamColor.WHITE) {
             left(myPosition, moves, promotion, attackLeft, leftMove);
         }
     }
 
-    private void left(ChessPosition myPosition, Collection<ChessMove> moves, boolean promotion, ChessPosition attackLeft, ChessMove leftMove) {
+    private void left(ChessPosition myPosition, Collection<ChessMove> moves,
+                      boolean promotion, ChessPosition attackLeft, ChessMove leftMove) {
         if (promotion) {
             ChessMove bishopPromotionMove = new ChessMove(myPosition, attackLeft, ChessPiece.PieceType.BISHOP);
             moves.add(bishopPromotionMove);
@@ -106,14 +108,16 @@ public class PawnMovesCalculator implements PieceMovesCalculator {
         }
     }
 
-    private void attackLeft(ChessBoard board,ChessPosition myPosition,Collection<ChessMove> moves,boolean promotion,ChessPosition attackLeft) {
+    private void attackLeft(ChessBoard board, ChessPosition myPosition,
+                            Collection<ChessMove> moves, boolean promotion, ChessPosition attackLeft) {
         ChessMove leftMove = new ChessMove(myPosition, attackLeft, null);
         if (!outsideBoard(attackLeft) && board.getPiece(attackLeft) != null && board.getPiece(attackLeft).getTeamColor() == ChessGame.TeamColor.BLACK) {
             left(myPosition, moves, promotion, attackLeft, leftMove);
         }
     }
 
-    private void newPosNull(ChessBoard board,ChessPosition myPosition,Collection<ChessMove> moves,boolean promotion,ChessPosition newPosition,ChessMove newMove) {
+    private void newPosNull(ChessBoard board, ChessPosition myPosition, Collection<ChessMove> moves,
+                            boolean promotion, ChessPosition newPosition, ChessMove newMove) {
         if (board.getPiece(newPosition) == null) {
             left(myPosition, moves,
                     promotion, newPosition, newMove);

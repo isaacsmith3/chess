@@ -22,43 +22,44 @@ public class RookMovesCalculator implements PieceMovesCalculator {
         // up
         for (int i = row+1; i <= 8; i++) {
             ChessPosition newPosition = new ChessPosition(i, col);
-            ChessMove newMove = new ChessMove(myPosition, newPosition, null);
-            if ((!validMove(newMove, myPosition, newPosition, board, moves))) {
+            if (loop(board, myPosition, newPosition, moves)) {
                 break;
             }
-            moves.add(newMove);
         }
 
         // down
         for (int i = row-1; i >= 1; i--) {
             ChessPosition newPosition = new ChessPosition(i, col);
-            ChessMove newMove = new ChessMove(myPosition, newPosition, null);
-            if ((!validMove(newMove, myPosition, newPosition, board, moves))) {
+            if (loop(board, myPosition, newPosition, moves)) {
                 break;
             }
-            moves.add(newMove);
         }
 
         // left
         for (int i = col-1; i >= 1; i--) {
             ChessPosition newPosition = new ChessPosition(row, i);
-            ChessMove newMove = new ChessMove(myPosition, newPosition, null);
-            if ((!validMove(newMove, myPosition, newPosition, board, moves))) {
+            if (loop(board, myPosition, newPosition, moves)) {
                 break;
             }
-            moves.add(newMove);
         }
 
         // right
         for (int i = col+1; i <= 8; i++) {
             ChessPosition newPosition = new ChessPosition(row, i);
-            ChessMove newMove = new ChessMove(myPosition, newPosition, null);
-            if ((!validMove(newMove, myPosition, newPosition, board, moves))) {
+            if (loop(board, myPosition, newPosition, moves)) {
                 break;
             }
-            moves.add(newMove);
         }
 
         return moves;
+    }
+
+    private boolean loop(ChessBoard board, ChessPosition myPosition, ChessPosition newPosition, Collection<ChessMove> moves) {
+        ChessMove newMove = new ChessMove(myPosition, newPosition, null);
+        if ((!validMove(newMove, myPosition, newPosition, board, moves))) {
+            return true;
+        }
+        moves.add(newMove);
+        return false;
     }
 }

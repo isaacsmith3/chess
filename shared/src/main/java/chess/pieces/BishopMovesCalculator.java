@@ -21,11 +21,9 @@ public class BishopMovesCalculator implements PieceMovesCalculator {
         for (int i = row+1; i <= 8; i++) {
             j++;
             ChessPosition newPosition = new ChessPosition(i, j);
-            ChessMove newMove = new ChessMove(myPosition, newPosition, null);
-            if ((!validMove(newMove, myPosition, newPosition, board, moves))) {
+            if (loop(board, myPosition, newPosition, moves)) {
                 break;
             }
-            moves.add(newMove);
         }
 
         // left and up
@@ -33,11 +31,9 @@ public class BishopMovesCalculator implements PieceMovesCalculator {
         for (int i = row+1; i <= 8; i++) {
             j--;
             ChessPosition newPosition = new ChessPosition(i, j);
-            ChessMove newMove = new ChessMove(myPosition, newPosition, null);
-            if ((!validMove(newMove, myPosition, newPosition, board, moves))) {
+            if (loop(board, myPosition, newPosition, moves)) {
                 break;
             }
-            moves.add(newMove);
         }
 
         // right and down
@@ -45,11 +41,9 @@ public class BishopMovesCalculator implements PieceMovesCalculator {
         for (int i = row-1; i >= 1; i--) {
             j++;
             ChessPosition newPosition = new ChessPosition(i, j);
-            ChessMove newMove = new ChessMove(myPosition, newPosition, null);
-            if ((!validMove(newMove, myPosition, newPosition, board, moves))) {
+            if (loop(board, myPosition, newPosition, moves)) {
                 break;
             }
-            moves.add(newMove);
         }
 
         // left and down
@@ -57,13 +51,20 @@ public class BishopMovesCalculator implements PieceMovesCalculator {
         for (int i = row-1; i >= 1; i--) {
             j--;
             ChessPosition newPosition = new ChessPosition(i, j);
-            ChessMove newMove = new ChessMove(myPosition, newPosition, null);
-            if ((!validMove(newMove, myPosition, newPosition, board, moves))) {
+            if (loop(board, myPosition, newPosition, moves)) {
                 break;
             }
-            moves.add(newMove);
         }
 
         return moves;
+    }
+
+    private boolean loop(ChessBoard board, ChessPosition myPosition, ChessPosition newPosition, Collection<ChessMove> moves) {
+        ChessMove newMove = new ChessMove(myPosition, newPosition, null);
+        if ((!validMove(newMove, myPosition, newPosition, board, moves))) {
+            return true;
+        }
+        moves.add(newMove);
+        return false;
     }
 }
