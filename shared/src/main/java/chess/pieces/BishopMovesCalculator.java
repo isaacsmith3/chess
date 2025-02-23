@@ -1,4 +1,4 @@
-package chess.pieceMovements;
+package chess.pieces;
 
 import chess.*;
 
@@ -22,7 +22,7 @@ public class BishopMovesCalculator implements PieceMovesCalculator {
             j++;
             ChessPosition newPosition = new ChessPosition(i, j);
             ChessMove newMove = new ChessMove(myPosition, newPosition, null);
-            if ((!isValidMove(newMove, myPosition, newPosition, board, moves))) {
+            if ((!validMove(newMove, myPosition, newPosition, board, moves))) {
                 break;
             }
             moves.add(newMove);
@@ -34,7 +34,7 @@ public class BishopMovesCalculator implements PieceMovesCalculator {
             j--;
             ChessPosition newPosition = new ChessPosition(i, j);
             ChessMove newMove = new ChessMove(myPosition, newPosition, null);
-            if ((!isValidMove(newMove, myPosition, newPosition, board, moves))) {
+            if ((!validMove(newMove, myPosition, newPosition, board, moves))) {
                 break;
             }
             moves.add(newMove);
@@ -46,7 +46,7 @@ public class BishopMovesCalculator implements PieceMovesCalculator {
             j++;
             ChessPosition newPosition = new ChessPosition(i, j);
             ChessMove newMove = new ChessMove(myPosition, newPosition, null);
-            if ((!isValidMove(newMove, myPosition, newPosition, board, moves))) {
+            if ((!validMove(newMove, myPosition, newPosition, board, moves))) {
                 break;
             }
             moves.add(newMove);
@@ -58,7 +58,7 @@ public class BishopMovesCalculator implements PieceMovesCalculator {
             j--;
             ChessPosition newPosition = new ChessPosition(i, j);
             ChessMove newMove = new ChessMove(myPosition, newPosition, null);
-            if ((!isValidMove(newMove, myPosition, newPosition, board, moves))) {
+            if ((!validMove(newMove, myPosition, newPosition, board, moves))) {
                 break;
             }
             moves.add(newMove);

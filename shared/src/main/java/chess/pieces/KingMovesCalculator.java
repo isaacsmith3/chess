@@ -1,4 +1,4 @@
-package chess.pieceMovements;
+package chess.pieces;
 
 import chess.ChessBoard;
 import chess.ChessMove;
@@ -22,56 +22,56 @@ public class KingMovesCalculator implements PieceMovesCalculator {
         // up
         ChessPosition newPosition = new ChessPosition(row+1, col);
         ChessMove newMove = new ChessMove(myPosition, newPosition, null);
-        if ((isValidMove(newMove, myPosition, newPosition, board, moves))) {
+        if ((validMove(newMove, myPosition, newPosition, board, moves))) {
             moves.add(newMove);
         }
 
         // down
         newPosition = new ChessPosition(row-1, col);
         newMove = new ChessMove(myPosition, newPosition, null);
-        if ((isValidMove(newMove, myPosition, newPosition, board, moves))) {
+        if ((validMove(newMove, myPosition, newPosition, board, moves))) {
             moves.add(newMove);
         }
 
         // left
         newPosition = new ChessPosition(row, col-1);
         newMove = new ChessMove(myPosition, newPosition, null);
-        if ((isValidMove(newMove, myPosition, newPosition, board, moves))) {
+        if ((validMove(newMove, myPosition, newPosition, board, moves))) {
             moves.add(newMove);
         }
 
         // right
         newPosition = new ChessPosition(row, col+1);
         newMove = new ChessMove(myPosition, newPosition, null);
-        if ((isValidMove(newMove, myPosition, newPosition, board, moves))) {
+        if ((validMove(newMove, myPosition, newPosition, board, moves))) {
             moves.add(newMove);
         }
 
         // right and up
         newPosition = new ChessPosition(row+1, col+1);
         newMove = new ChessMove(myPosition, newPosition, null);
-        if ((isValidMove(newMove, myPosition, newPosition, board, moves))) {
+        if ((validMove(newMove, myPosition, newPosition, board, moves))) {
             moves.add(newMove);
         }
 
         // right and down
         newPosition = new ChessPosition(row-1, col+1);
         newMove = new ChessMove(myPosition, newPosition, null);
-        if ((isValidMove(newMove, myPosition, newPosition, board, moves))) {
+        if ((validMove(newMove, myPosition, newPosition, board, moves))) {
             moves.add(newMove);
         }
 
         // left and up
         newPosition = new ChessPosition(row+1, col-1);
         newMove = new ChessMove(myPosition, newPosition, null);
-        if ((isValidMove(newMove, myPosition, newPosition, board, moves))) {
+        if ((validMove(newMove, myPosition, newPosition, board, moves))) {
             moves.add(newMove);
         }
 
         // left and down
         newPosition = new ChessPosition(row-1, col-1);
         newMove = new ChessMove(myPosition, newPosition, null);
-        if ((isValidMove(newMove, myPosition, newPosition, board, moves))) {
+        if ((validMove(newMove, myPosition, newPosition, board, moves))) {
             moves.add(newMove);
         }
 

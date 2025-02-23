@@ -170,21 +170,28 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
+        if (stalemateLoop(teamColor)) {
+            return false;
+        }
+        if (isInCheck(teamColor)) {  // Check if the king is in check
+            return false;
+        }
+        return true;
+    }
+
+    private boolean stalemateLoop(TeamColor teamColor) {
         for (int i = 1; i <= 8; i++ ) {
             for (int j = 1; j <= 8; j++ ) {
                 ChessPosition position = new ChessPosition(i, j);
                 ChessPiece piece = board.getPiece(position);
                 if (piece != null && piece.getTeamColor() == teamColor) {
                     if (!validMoves(position).isEmpty()) {
-                        return false;
+                        return true;
                     }
                 }
             }
         }
-        if (isInCheck(teamColor)) {  // Check if the king is in check
-            return false;
-        }
-        return true;
+        return false;
     }
 
 
@@ -196,16 +203,8 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInPureStalemate(TeamColor teamColor) {
-        for (int i = 1; i <= 8; i++ ) {
-            for (int j = 1; j <= 8; j++ ) {
-                ChessPosition position = new ChessPosition(i, j);
-                ChessPiece piece = board.getPiece(position);
-                if (piece != null && piece.getTeamColor() == teamColor) {
-                    if (!validMoves(position).isEmpty()) {
-                        return false;
-                    }
-                }
-            }
+        if (stalemateLoop(teamColor)) {
+            return false;
         }
         // No check if the king is in check
         return true;

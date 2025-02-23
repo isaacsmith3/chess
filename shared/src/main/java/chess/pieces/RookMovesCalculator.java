@@ -1,4 +1,4 @@
-package chess.pieceMovements;
+package chess.pieces;
 
 import chess.ChessBoard;
 import chess.ChessMove;
@@ -23,7 +23,7 @@ public class RookMovesCalculator implements PieceMovesCalculator {
         for (int i = row+1; i <= 8; i++) {
             ChessPosition newPosition = new ChessPosition(i, col);
             ChessMove newMove = new ChessMove(myPosition, newPosition, null);
-            if ((!isValidMove(newMove, myPosition, newPosition, board, moves))) {
+            if ((!validMove(newMove, myPosition, newPosition, board, moves))) {
                 break;
             }
             moves.add(newMove);
@@ -33,7 +33,7 @@ public class RookMovesCalculator implements PieceMovesCalculator {
         for (int i = row-1; i >= 1; i--) {
             ChessPosition newPosition = new ChessPosition(i, col);
             ChessMove newMove = new ChessMove(myPosition, newPosition, null);
-            if ((!isValidMove(newMove, myPosition, newPosition, board, moves))) {
+            if ((!validMove(newMove, myPosition, newPosition, board, moves))) {
                 break;
             }
             moves.add(newMove);
@@ -43,7 +43,7 @@ public class RookMovesCalculator implements PieceMovesCalculator {
         for (int i = col-1; i >= 1; i--) {
             ChessPosition newPosition = new ChessPosition(row, i);
             ChessMove newMove = new ChessMove(myPosition, newPosition, null);
-            if ((!isValidMove(newMove, myPosition, newPosition, board, moves))) {
+            if ((!validMove(newMove, myPosition, newPosition, board, moves))) {
                 break;
             }
             moves.add(newMove);
@@ -53,7 +53,7 @@ public class RookMovesCalculator implements PieceMovesCalculator {
         for (int i = col+1; i <= 8; i++) {
             ChessPosition newPosition = new ChessPosition(row, i);
             ChessMove newMove = new ChessMove(myPosition, newPosition, null);
-            if ((!isValidMove(newMove, myPosition, newPosition, board, moves))) {
+            if ((!validMove(newMove, myPosition, newPosition, board, moves))) {
                 break;
             }
             moves.add(newMove);
