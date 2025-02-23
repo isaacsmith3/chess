@@ -30,7 +30,8 @@ public class GameService {
         return gameDAO.createGame(gameName);
     }
 
-    public void joinGame(String authToken, JoinGameRequest gameRequest) throws InvalidAuthTokenException, InvalidGameException, InvalidCredentialsException, InvalidGameRequestException {
+    public void joinGame(String authToken, JoinGameRequest gameRequest)
+            throws InvalidAuthTokenException, InvalidGameException, InvalidCredentialsException, InvalidGameRequestException {
         AuthData verifiedAuth = authTokenDAO.verifyAuth(authToken);
         String playerColor = gameRequest.playerColor();
 

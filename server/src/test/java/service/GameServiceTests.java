@@ -64,7 +64,9 @@ public class GameServiceTests {
     }
 
     @Test
-    public void positiveTestJoinGame() throws UserService.DuplicateUserException, GameService.InvalidAuthTokenException, GameService.InvalidGameException, GameService.InvalidCredentialsException, GameService.InvalidGameRequestException {
+    public void positiveTestJoinGame()
+            throws UserService.DuplicateUserException, GameService.InvalidAuthTokenException, GameService.InvalidGameException,
+            GameService.InvalidCredentialsException, GameService.InvalidGameRequestException {
         userService.register(new UserData("username", "password", "email"));
 
         Collection<UserData> userDataCollection = userDAO.getAllUsers();

@@ -1,11 +1,14 @@
-package chess.piece_movements;
+package chess.pieceMovements;
 
-import chess.*;
+import chess.ChessBoard;
+import chess.ChessMove;
+import chess.ChessPosition;
+import chess.PieceMovesCalculator;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class BishopMovesCalculator implements PieceMovesCalculator {
+public class RookMovesCalculator implements PieceMovesCalculator {
 
 
     @Override
@@ -15,12 +18,10 @@ public class BishopMovesCalculator implements PieceMovesCalculator {
         // Begin calculation
         int row = myPosition.getRow();
         int col = myPosition.getColumn();
-        int j = col;
 
-        // right and up
+        // up
         for (int i = row+1; i <= 8; i++) {
-            j++;
-            ChessPosition newPosition = new ChessPosition(i, j);
+            ChessPosition newPosition = new ChessPosition(i, col);
             ChessMove newMove = new ChessMove(myPosition, newPosition, null);
             if ((!isValidMove(newMove, myPosition, newPosition, board, moves))) {
                 break;
@@ -28,23 +29,9 @@ public class BishopMovesCalculator implements PieceMovesCalculator {
             moves.add(newMove);
         }
 
-        // left and up
-        j = col;
-        for (int i = row+1; i <= 8; i++) {
-            j--;
-            ChessPosition newPosition = new ChessPosition(i, j);
-            ChessMove newMove = new ChessMove(myPosition, newPosition, null);
-            if ((!isValidMove(newMove, myPosition, newPosition, board, moves))) {
-                break;
-            }
-            moves.add(newMove);
-        }
-
-        // right and down
-        j = col;
+        // down
         for (int i = row-1; i >= 1; i--) {
-            j++;
-            ChessPosition newPosition = new ChessPosition(i, j);
+            ChessPosition newPosition = new ChessPosition(i, col);
             ChessMove newMove = new ChessMove(myPosition, newPosition, null);
             if ((!isValidMove(newMove, myPosition, newPosition, board, moves))) {
                 break;
@@ -52,11 +39,19 @@ public class BishopMovesCalculator implements PieceMovesCalculator {
             moves.add(newMove);
         }
 
-        // left and down
-        j = col;
-        for (int i = row-1; i >= 1; i--) {
-            j--;
-            ChessPosition newPosition = new ChessPosition(i, j);
+        // left
+        for (int i = col-1; i >= 1; i--) {
+            ChessPosition newPosition = new ChessPosition(row, i);
+            ChessMove newMove = new ChessMove(myPosition, newPosition, null);
+            if ((!isValidMove(newMove, myPosition, newPosition, board, moves))) {
+                break;
+            }
+            moves.add(newMove);
+        }
+
+        // right
+        for (int i = col+1; i <= 8; i++) {
+            ChessPosition newPosition = new ChessPosition(row, i);
             ChessMove newMove = new ChessMove(myPosition, newPosition, null);
             if ((!isValidMove(newMove, myPosition, newPosition, board, moves))) {
                 break;
