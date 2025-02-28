@@ -1,6 +1,8 @@
 package service;
 
 import dataaccess.*;
+import dataaccess.memory.MemoryAuthTokenDAO;
+import dataaccess.memory.MemoryUserDAO;
 import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.BeforeEach;

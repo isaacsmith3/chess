@@ -1,6 +1,9 @@
 package server;
 
 import dataaccess.*;
+import dataaccess.memory.MemoryAuthTokenDAO;
+import dataaccess.memory.MemoryGameDAO;
+import dataaccess.memory.MemoryUserDAO;
 import handler.*;
 import spark.*;
 

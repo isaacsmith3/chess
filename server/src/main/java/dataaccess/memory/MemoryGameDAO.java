@@ -1,6 +1,7 @@
-package dataaccess;
+package dataaccess.memory;
 
 import chess.ChessGame;
+import dataaccess.GameDAO;
 import types.CreateGameResult;
 import types.JoinGameRequest;
 import types.ListGamesResult;
@@ -8,7 +9,6 @@ import model.GameData;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
