@@ -39,7 +39,7 @@ public class GameServiceTests {
         assertTrue(userDataCollection.size() == 1);
         assertTrue(userDataCollection.contains(new UserData("username", "password", "email")));
 
-        Collection<AuthData> authDataCollection = (Collection<AuthData>) authTokenDAO.getAuthDataCollection();
+        Collection<AuthData> authDataCollection = (Collection<AuthData>) authTokenDAO.getAuthTokens();
         assertTrue(authDataCollection.size() == 1);
         String auth = String.valueOf(authDataCollection.iterator().next().authToken());
 
@@ -60,7 +60,7 @@ public class GameServiceTests {
         assertTrue(userDataCollection.size() == 1);
         assertTrue(userDataCollection.contains(new UserData("username", "password", "email")));
 
-        Collection<AuthData> authDataCollection = (Collection<AuthData>) authTokenDAO.getAuthDataCollection();
+        Collection<AuthData> authDataCollection = (Collection<AuthData>) authTokenDAO.getAuthTokens();
         assertTrue(authDataCollection.size() == 1);
 
         assertThrows(GameService.InvalidAuthTokenException.class, () -> gameService.createGame("1234", "game1"));
@@ -76,7 +76,7 @@ public class GameServiceTests {
         assertTrue(userDataCollection.size() == 1);
         assertTrue(userDataCollection.contains(new UserData("username", "password", "email")));
 
-        Collection<AuthData> authDataCollection = (Collection<AuthData>) authTokenDAO.getAuthDataCollection();
+        Collection<AuthData> authDataCollection = (Collection<AuthData>) authTokenDAO.getAuthTokens();
         assertTrue(authDataCollection.size() == 1);
         String auth = String.valueOf(authDataCollection.iterator().next().authToken());
 
@@ -102,7 +102,7 @@ public class GameServiceTests {
         assertTrue(userDataCollection.size() == 1);
         assertTrue(userDataCollection.contains(new UserData("username", "password", "email")));
 
-        Collection<AuthData> authDataCollection = (Collection<AuthData>) authTokenDAO.getAuthDataCollection();
+        Collection<AuthData> authDataCollection = (Collection<AuthData>) authTokenDAO.getAuthTokens();
         assertTrue(authDataCollection.size() == 1);
         String auth = String.valueOf(authDataCollection.iterator().next().authToken());
 
@@ -124,7 +124,7 @@ public class GameServiceTests {
         assertTrue(userDataCollection.size() == 1);
         assertTrue(userDataCollection.contains(new UserData("username", "password", "email")));
 
-        Collection<AuthData> authDataCollection = (Collection<AuthData>) authTokenDAO.getAuthDataCollection();
+        Collection<AuthData> authDataCollection = (Collection<AuthData>) authTokenDAO.getAuthTokens();
         assertTrue(authDataCollection.size() == 1);
         String auth = String.valueOf(authDataCollection.iterator().next().authToken());
 
@@ -140,7 +140,7 @@ public class GameServiceTests {
         assertTrue(userDataCollection.size() == 1);
         assertTrue(userDataCollection.contains(new UserData("username", "password", "email")));
 
-        Collection<AuthData> authDataCollection = (Collection<AuthData>) authTokenDAO.getAuthDataCollection();
+        Collection<AuthData> authDataCollection = (Collection<AuthData>) authTokenDAO.getAuthTokens();
         assertTrue(authDataCollection.size() == 1);
         String auth = String.valueOf(authDataCollection.iterator().next().authToken());
 
@@ -163,7 +163,7 @@ public class GameServiceTests {
         assertTrue(userDataCollection.size() == 1);
         assertTrue(userDataCollection.contains(new UserData("username", "password", "email")));
 
-        Collection<AuthData> authDataCollection = (Collection<AuthData>) authTokenDAO.getAuthDataCollection();
+        Collection<AuthData> authDataCollection = (Collection<AuthData>) authTokenDAO.getAuthTokens();
         assertTrue(authDataCollection.size() == 1);
         String auth = String.valueOf(authDataCollection.iterator().next().authToken());
 

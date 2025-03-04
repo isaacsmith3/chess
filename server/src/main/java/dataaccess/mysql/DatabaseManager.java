@@ -5,6 +5,8 @@ import dataaccess.DataAccessException;
 import java.sql.*;
 import java.util.Properties;
 
+import static java.sql.Types.NULL;
+
 public class DatabaseManager {
     private static final String DATABASE_NAME;
     private static final String USER;
@@ -69,6 +71,68 @@ public class DatabaseManager {
             return conn;
         } catch (SQLException e) {
             throw new DataAccessException(e.getMessage());
+        }
+    }
+
+    public void executeUpdate(String statement, Object... params) throws DataAccessException {
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var ps = conn.prepareStatement(statement)) {
+                for (var i = 0; i < params.length; i++) {
+                    var param = params[i];
+                    switch (param) {
+                        case String p -> ps.setString(i + 1, p);
+                        case Integer p -> ps.setInt(i + 1, p);
+                        case null -> ps.setNull(i + 1, NULL);
+                        default -> {
+                        }
+                    }
+                }
+                ps.executeUpdate();
+
+//                var rs = ps.getGeneratedKeys();
+//                if (rs.next()) {
+//                    return rs.getInt(1);
+//                }
+//
+//                return 0;
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(String.format("unable to update database: %s, %s", statement, e.getMessage()));
+        }
+    }
+
+    private final String[] createStatements = {
+            """
+            CREATE TABLE IF NOT EXISTS users (
+            `Username` varchar(255) NOT NULL,
+            `Password` varchar(255) NOT NULL,
+            `Email` varchar(255) NOT NULL,
+            `json` TEXT DEFAULT NULL,
+            PRIMARY KEY (`Username`)
+            )
+            """,
+                    """
+            CREATE TABLE IF NOT EXISTS auth (
+            `AuthToken` varchar(255) NOT NULL,
+            `Username` varchar(255) NOT NULL,
+            `json` TEXT DEFAULT NULL,
+            PRIMARY KEY (`AuthToken`)
+            )
+    """
+    };
+
+
+
+    public void configureDatabase() throws DataAccessException {
+        DatabaseManager.createDatabase();
+        try (var conn = DatabaseManager.getConnection()) {
+            for (var statement : createStatements) {
+                try (var preparedStatement = conn.prepareStatement(statement)) {
+                    preparedStatement.executeUpdate();
+                }
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException(String.format("Unable to configure database: %s", ex.getMessage()));
         }
     }
 }

@@ -32,7 +32,7 @@ public class UserServiceTests {
         assertTrue(userDataCollection.size() == 1);
         assertTrue(userDataCollection.contains(new UserData("username", "password", "email")));
 
-        Collection<AuthData> authDataCollection = (Collection<AuthData>) authTokenDAO.getAuthDataCollection();
+        Collection<AuthData> authDataCollection = (Collection<AuthData>) authTokenDAO.getAuthTokens();
         assertTrue(authDataCollection.size() == 1);
     }
 
@@ -49,11 +49,11 @@ public class UserServiceTests {
         assertTrue(userDataCollection.size() == 1);
         assertTrue(userDataCollection.contains(new UserData("isaac", "password", "email")));
 
-        Collection<AuthData> authDataCollection = (Collection<AuthData>) authTokenDAO.getAuthDataCollection();
+        Collection<AuthData> authDataCollection = (Collection<AuthData>) authTokenDAO.getAuthTokens();
         String auth = String.valueOf(authDataCollection.iterator().next().authToken());
 
         userService.logout(auth);
-        authDataCollection = (Collection<AuthData>) authTokenDAO.getAuthDataCollection();
+        authDataCollection = (Collection<AuthData>) authTokenDAO.getAuthTokens();
         assertTrue(authDataCollection.isEmpty());
     }
 
@@ -76,15 +76,15 @@ public class UserServiceTests {
         assertTrue(userDataCollection.size() == 1);
         assertTrue(userDataCollection.contains(new UserData("isaac", "password", "email")));
 
-        Collection<AuthData> authDataCollection = (Collection<AuthData>) authTokenDAO.getAuthDataCollection();
+        Collection<AuthData> authDataCollection = (Collection<AuthData>) authTokenDAO.getAuthTokens();
         String auth = String.valueOf(authDataCollection.iterator().next().authToken());
 
         userService.logout(auth);
-        authDataCollection = (Collection<AuthData>) authTokenDAO.getAuthDataCollection();
+        authDataCollection = (Collection<AuthData>) authTokenDAO.getAuthTokens();
         assertTrue(authDataCollection.isEmpty());
 
         userService.login(new UserData("isaac", "password", "email"));
-        authDataCollection = (Collection<AuthData>) authTokenDAO.getAuthDataCollection();
+        authDataCollection = (Collection<AuthData>) authTokenDAO.getAuthTokens();
         assertTrue(authDataCollection.size() == 1);
         userDataCollection = (Collection<UserData>) userDAO.getAllUsers();
         assertTrue(userDataCollection.size() == 1);
@@ -97,11 +97,11 @@ public class UserServiceTests {
         assertTrue(userDataCollection.size() == 1);
         assertTrue(userDataCollection.contains(new UserData("isaac", "password", "email")));
 
-        Collection<AuthData> authDataCollection = (Collection<AuthData>) authTokenDAO.getAuthDataCollection();
+        Collection<AuthData> authDataCollection = (Collection<AuthData>) authTokenDAO.getAuthTokens();
         String auth = String.valueOf(authDataCollection.iterator().next().authToken());
 
         userService.logout(auth);
-        authDataCollection = (Collection<AuthData>) authTokenDAO.getAuthDataCollection();
+        authDataCollection = (Collection<AuthData>) authTokenDAO.getAuthTokens();
         assertTrue(authDataCollection.isEmpty());
 
         assertThrows(UserService.InvalidCredentialsException.class, () -> {

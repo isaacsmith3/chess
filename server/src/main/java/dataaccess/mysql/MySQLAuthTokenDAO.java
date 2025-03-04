@@ -1,19 +1,27 @@
 package dataaccess.mysql;
 
+import com.google.gson.Gson;
 import dataaccess.AuthTokenDAO;
+import dataaccess.DataAccessException;
 import model.AuthData;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 public class MySQLAuthTokenDAO implements AuthTokenDAO {
 
     public DatabaseManager databaseManager = new DatabaseManager();
 
-    public MySQLAuthTokenDAO() {
-
+    public MySQLAuthTokenDAO() throws DataAccessException {
+        databaseManager.configureDatabase();
     }
 
     @Override
-    public void createAuth(AuthData authData) {
-
+    public void createAuth(AuthData authData) throws DataAccessException {
+        var SQLStatement = "INSERT INTO auth_token (Username, AuthToken, json) VALUES (?, ?, ?)";
+        var json = new Gson().toJson(authData);
+        databaseManager.executeUpdate(SQLStatement, authData.authToken(), authData.userName(), json);
     }
 
     @Override
@@ -22,7 +30,16 @@ public class MySQLAuthTokenDAO implements AuthTokenDAO {
     }
 
     @Override
-    public String deleteAuth(String auth) {
+    public String deleteAuth(String auth) throws DataAccessException {
+//        try (Connection conn = databaseManager.getConnection()) {
+//            var SQLStatement = "DELETE FROM auth_token WHERE user_id = ? AND token = ?";
+//
+//        } catch (SQLException e) {
+//            throw new DataAccessException(e.getMessage());
+//        } catch (DataAccessException e) {
+//            throw new RuntimeException(e);
+//        }
+
         return "";
     }
 
@@ -37,7 +54,7 @@ public class MySQLAuthTokenDAO implements AuthTokenDAO {
     }
 
     @Override
-    public Object getAuthDataCollection() {
+    public Object getAuthTokens() {
         return null;
     }
 }

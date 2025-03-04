@@ -1,10 +1,13 @@
 package service;
 
 import dataaccess.AuthTokenDAO;
+import dataaccess.DataAccessException;
 import dataaccess.UserDAO;
 import types.AuthResult;
 import model.AuthData;
 import model.UserData;
+
+import java.sql.SQLException;
 import java.util.UUID;
 
 public class UserService {
@@ -19,54 +22,66 @@ public class UserService {
 
     public AuthResult register(UserData request) throws DuplicateUserException {
 
-        if (request.username() == null || request.password() == null) {
-            throw new IllegalArgumentException("Missing required fields");
-        }
+         try {
+            if (request.username() == null || request.password() == null) {
+                throw new IllegalArgumentException("Missing required fields");
+            }
 
-        UserData existingUser = userDAO.getUser(request.username());
+            UserData existingUser = userDAO.getUser(request.username());
 
-        if (existingUser != null) {
-            throw new DuplicateUserException("Username already exists");
-        }
+            if (existingUser != null) {
+                throw new DuplicateUserException("Username already exists");
+            }
 
-        userDAO.createUser(request);
+            userDAO.createUser(request);
 
-        String authToken = UUID.randomUUID().toString();
-        AuthData authData = new AuthData(authToken, request.username());
+            String authToken = UUID.randomUUID().toString();
+            AuthData authData = new AuthData(authToken, request.username());
 
-        authTokenDAO.createAuth(authData);
+            authTokenDAO.createAuth(authData);
 
-        return new AuthResult(request.username(), authData.authToken());
+            return new AuthResult(request.username(), authData.authToken());
+        } catch (SQLException | DataAccessException e) {
+             throw new DuplicateUserException(e.getMessage());
+         }
     }
 
     public AuthResult login(UserData request) throws InvalidCredentialsException {
-        if (request.username() == null || request.password() == null) {
-            throw new IllegalArgumentException("Missing required fields");
-        }
+         try {
+            if (request.username() == null || request.password() == null) {
+                throw new IllegalArgumentException("Missing required fields");
+            }
 
-        UserData existingUser = userDAO.getUser(request.username());
+            UserData existingUser = userDAO.getUser(request.username());
 
-        if (existingUser == null) {
-            throw new InvalidCredentialsException("Username not found");
-        }
+            if (existingUser == null) {
+                throw new InvalidCredentialsException("Username not found");
+            }
 
-        if (!request.password().equals(existingUser.password())) {
-            throw new InvalidCredentialsException("Passwords do not match");
-        }
+            if (!request.password().equals(existingUser.password())) {
+                throw new InvalidCredentialsException("Passwords do not match");
+            }
 
-        String authToken = UUID.randomUUID().toString();
-        AuthData authData = new AuthData(authToken, request.username());
+            String authToken = UUID.randomUUID().toString();
+            AuthData authData = new AuthData(authToken, request.username());
 
-        authTokenDAO.createAuth(authData);
+            authTokenDAO.createAuth(authData);
 
-        return new AuthResult(request.username(), authData.authToken());
+            return new AuthResult(request.username(), authData.authToken());
+        } catch (SQLException | DataAccessException e) {
+             throw new InvalidCredentialsException(e.getMessage());
+         }
 
     }
 
     public void logout(String auth) throws InvalidCredentialsException {
-        String removedAuth = authTokenDAO.deleteAuth(auth);
-        if (removedAuth == null) {
-            throw new InvalidCredentialsException("Auth token does not exist");
+        try {
+            String removedAuth = authTokenDAO.deleteAuth(auth);
+            if (removedAuth == null) {
+                throw new InvalidCredentialsException("Auth token does not exist");
+            }
+        } catch (DataAccessException e) {
+            throw new InvalidCredentialsException(e.getMessage());
         }
     }
 

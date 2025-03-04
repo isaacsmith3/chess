@@ -29,7 +29,7 @@ public class ClearServiceTests {
     @Test
     public void emptyDatabase() throws DataAccessException {
         clearService.clear();
-        Collection<AuthData> authDataCollection = (Collection<AuthData>) authTokenDAO.getAuthDataCollection();
+        Collection<AuthData> authDataCollection = (Collection<AuthData>) authTokenDAO.getAuthTokens();
         assertTrue(authDataCollection.isEmpty());
     }
 

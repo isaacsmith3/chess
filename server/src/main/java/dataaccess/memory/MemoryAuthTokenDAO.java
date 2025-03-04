@@ -11,7 +11,7 @@ public class MemoryAuthTokenDAO implements AuthTokenDAO {
     private Collection<AuthData> authDataCollection;
 
     @Override
-    public Collection<AuthData> getAuthDataCollection() {
+    public Collection<AuthData> getAuthTokens() {
         return authDataCollection;
     }
 
