@@ -32,11 +32,6 @@ public class MemoryAuthTokenDAO implements AuthTokenDAO {
     }
 
     @Override
-    public void clearAuth() {
-        authDataCollection.clear();
-    }
-
-    @Override
     public String deleteAuth(String auth) {
         for (AuthData authData : authDataCollection) {
             if (authData.authToken().equals(auth)) {

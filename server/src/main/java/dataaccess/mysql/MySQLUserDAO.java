@@ -53,7 +53,12 @@ public class MySQLUserDAO implements UserDAO {
 
     @Override
     public void clear() {
-
+        try {
+            var SQLStatement = "DELETE FROM users";
+            databaseManager.executeUpdate(SQLStatement);
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

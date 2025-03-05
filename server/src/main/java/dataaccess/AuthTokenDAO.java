@@ -6,7 +6,6 @@ import java.sql.SQLException;
 
 public interface AuthTokenDAO {
     void createAuth(AuthData authData) throws DataAccessException, SQLException;
-    void clearAuth();
     String deleteAuth(String auth) throws DataAccessException;
     AuthData verifyAuth(String auth);
     void clear();

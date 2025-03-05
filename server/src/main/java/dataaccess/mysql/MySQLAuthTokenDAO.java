@@ -24,11 +24,6 @@ public class MySQLAuthTokenDAO implements AuthTokenDAO {
     }
 
     @Override
-    public void clearAuth() {
-
-    }
-
-    @Override
     public String deleteAuth(String auth) throws DataAccessException {
         try (Connection conn = databaseManager.getConnection()) {
             var SQLStatement = "DELETE FROM auths WHERE authToken = ?";
@@ -39,7 +34,7 @@ public class MySQLAuthTokenDAO implements AuthTokenDAO {
                     throw new DataAccessException("Error: unauthorized");
                 }
             } catch (SQLException e) {
-                e.printStackTrace();
+                throw new DataAccessException("Error: unauthorized");
             }
         } catch (SQLException e) {
             throw new DataAccessException(e.getMessage());
@@ -56,7 +51,12 @@ public class MySQLAuthTokenDAO implements AuthTokenDAO {
 
     @Override
     public void clear() {
-        var SQLStatement = "DELETE FROM auths";
+        try {
+            var SQLStatement = "DELETE FROM auths";
+            databaseManager.executeUpdate(SQLStatement);
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

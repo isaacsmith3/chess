@@ -33,8 +33,8 @@ public class Server {
         // Register your endpoints and handle exceptions here.
         try {
             Spark.delete("/db", (request, response) -> {
-                userDAO.clear();
-                authTokenDAO.clearAuth();
+                SQLuserDAO.clear();
+                SQLauthTokenDAO.clear();
                 gameDAO.clear();
                 response.status(200);
                 return "";
