@@ -19,9 +19,8 @@ public class MySQLAuthTokenDAO implements AuthTokenDAO {
 
     @Override
     public void createAuth(AuthData authData) throws DataAccessException {
-        var SQLStatement = "INSERT INTO auth_token (Username, AuthToken, json) VALUES (?, ?, ?)";
-        var json = new Gson().toJson(authData);
-        databaseManager.executeUpdate(SQLStatement, authData.authToken(), authData.userName(), json);
+        var SQLStatement = "INSERT INTO auths (username, authToken) VALUES (?, ?)";
+        databaseManager.executeUpdate(SQLStatement, authData.authToken(), authData.userName());
     }
 
     @Override

@@ -23,27 +23,16 @@ public class MySQLUserDAO implements UserDAO {
 
     @Override
     public void createUser(UserData userData) throws DataAccessException {
-
-//        String hashedPassword = userData.password();
         String hashedPassword = BCrypt.hashpw(userData.password(), BCrypt.gensalt());
-
-
-
-//        if(userExists(userData)){
-//            throw new DataAccessException("Error: already taken");
-//        }
-
         userData = new UserData(userData.username(), hashedPassword, userData.email());
-        var json = new Gson().toJson(userData);
-        var statement = "INSERT INTO user (username, password, email) VALUES (?, ?, ?, ?)";
-        databaseManager.executeUpdate(statement, userData.username(), userData.password(), userData.email(), json);
-//        return userData;
+        var statement = "INSERT INTO users (username, password, email) VALUES (?, ?, ?)";
+        databaseManager.executeUpdate(statement, userData.username(), userData.password(), userData.email());
     }
 
     @Override
     public UserData getUser(String userName) {
         try (Connection conn = databaseManager.getConnection()) {
-            var SQLStatement = "SELECT json FROM user WHERE username = ?";
+            var SQLStatement = "SELECT username, password, email FROM users WHERE username = ?";
             try (PreparedStatement ps = conn.prepareStatement(SQLStatement)) {
                 ps.setString(1, userName);
                 try (ResultSet rs = ps.executeQuery()) {
@@ -54,7 +43,6 @@ public class MySQLUserDAO implements UserDAO {
                     }
                 }
             }
-
         } catch (SQLException | DataAccessException e) {
             throw new RuntimeException(e);
         }

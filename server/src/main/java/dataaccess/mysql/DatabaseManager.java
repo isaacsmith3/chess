@@ -88,13 +88,6 @@ public class DatabaseManager {
                     }
                 }
                 ps.executeUpdate();
-
-//                var rs = ps.getGeneratedKeys();
-//                if (rs.next()) {
-//                    return rs.getInt(1);
-//                }
-//
-//                return 0;
             }
         } catch (SQLException e) {
             throw new DataAccessException(String.format("unable to update database: %s, %s", statement, e.getMessage()));
@@ -104,24 +97,31 @@ public class DatabaseManager {
     private final String[] createStatements = {
             """
             CREATE TABLE IF NOT EXISTS users (
-            `Username` varchar(255) NOT NULL,
-            `Password` varchar(255) NOT NULL,
-            `Email` varchar(255) NOT NULL,
-            `json` TEXT DEFAULT NULL,
+            `username` varchar(255) NOT NULL,
+            `password` varchar(255) NOT NULL,
+            `email` varchar(255) NOT NULL,
             PRIMARY KEY (`Username`)
             )
             """,
-                    """
-            CREATE TABLE IF NOT EXISTS auth (
-            `AuthToken` varchar(255) NOT NULL,
-            `Username` varchar(255) NOT NULL,
-            `json` TEXT DEFAULT NULL,
-            PRIMARY KEY (`AuthToken`)
+            """
+            CREATE TABLE IF NOT EXISTS auths (
+            `authToken` varchar(255) NOT NULL,
+            `username` varchar(255) NOT NULL,
+            PRIMARY KEY (`authToken`)
             )
-    """
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS  game (
+              `gameId` int NOT NULL ,
+              `whiteUsername` varchar(256) DEFAULT NULL,
+              `blackUsername` varchar(256) DEFAULT NULL,
+              `gameName` varchar(256) NOT NULL,
+              `jsonChessGame` TEXT DEFAULT NULL,
+              `json` TEXT DEFAULT NULL,
+              PRIMARY KEY (`gameId`)
+            )
+            """
     };
-
-
 
     public void configureDatabase() throws DataAccessException {
         DatabaseManager.createDatabase();
