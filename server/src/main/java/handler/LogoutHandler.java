@@ -23,11 +23,7 @@ public class LogoutHandler {
             response.status(200);
             return "";
         } catch (Exception e) {
-            if (e instanceof UserService.InvalidCredentialsException) {
                 response.status(401); // Unauthorized
-            } else {
-                response.status(400);
-            }
             return new Gson().toJson(Map.of(
                     "message", "Error: " + e.getMessage(),
                     "success", false
