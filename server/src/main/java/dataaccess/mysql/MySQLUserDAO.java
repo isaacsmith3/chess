@@ -1,6 +1,5 @@
 package dataaccess.mysql;
 
-import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import dataaccess.UserDAO;
 import model.UserData;

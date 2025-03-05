@@ -5,6 +5,7 @@ import dataaccess.memory.MemoryAuthTokenDAO;
 import dataaccess.memory.MemoryGameDAO;
 import dataaccess.memory.MemoryUserDAO;
 import dataaccess.mysql.MySQLAuthTokenDAO;
+import dataaccess.mysql.MySQLGameDAO;
 import dataaccess.mysql.MySQLUserDAO;
 import handler.*;
 import spark.*;

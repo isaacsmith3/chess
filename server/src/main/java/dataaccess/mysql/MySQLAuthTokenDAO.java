@@ -4,9 +4,11 @@ import com.google.gson.Gson;
 import dataaccess.AuthTokenDAO;
 import dataaccess.DataAccessException;
 import model.AuthData;
+import model.UserData;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class MySQLAuthTokenDAO implements AuthTokenDAO {
@@ -45,8 +47,25 @@ public class MySQLAuthTokenDAO implements AuthTokenDAO {
     }
 
     @Override
-    public AuthData verifyAuth(String auth) {
-        return null;
+    public AuthData verifyAuth(String auth) throws DataAccessException {
+        try (Connection conn = databaseManager.getConnection()) {
+            var SQLStatement = "SELECT * FROM auths WHERE authToken = ?";
+            try (PreparedStatement ps = conn.prepareStatement(SQLStatement)) {
+                ps.setString(1, auth);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return new AuthData(rs.getString("authToken"), rs.getString("username"));
+                    }
+                    return null;
+                }
+            } catch (SQLException e) {
+                throw new DataAccessException("Error: unauthorized");
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

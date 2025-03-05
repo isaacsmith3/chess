@@ -1,6 +1,7 @@
 package service;
 
 import dataaccess.AuthTokenDAO;
+import dataaccess.DataAccessException;
 import dataaccess.GameDAO;
 import types.CreateGameResult;
 import types.JoinGameRequest;
@@ -21,60 +22,69 @@ public class GameService {
     }
 
     public CreateGameResult createGame(String authToken, String gameName) throws InvalidAuthTokenException {
-        AuthData verifiedAuth = authTokenDAO.verifyAuth(authToken);
+        try {
+            AuthData verifiedAuth = authTokenDAO.verifyAuth(authToken);
 
-        if (verifiedAuth == null) {
+            if (verifiedAuth == null) {
+                throw new InvalidAuthTokenException("Invalid auth token");
+            }
+
+            return gameDAO.createGame(gameName);
+        } catch (DataAccessException e) {
             throw new InvalidAuthTokenException("Invalid auth token");
         }
-
-        return gameDAO.createGame(gameName);
     }
 
-    public void joinGame(String authToken, JoinGameRequest gameRequest)
-            throws InvalidAuthTokenException, InvalidGameException, InvalidCredentialsException, InvalidGameRequestException {
-        AuthData verifiedAuth = authTokenDAO.verifyAuth(authToken);
-        String playerColor = gameRequest.playerColor();
+    public void joinGame(String authToken, JoinGameRequest gameRequest) throws InvalidAuthTokenException, InvalidGameException, InvalidCredentialsException, InvalidGameRequestException {
+        try {
+            AuthData verifiedAuth = authTokenDAO.verifyAuth(authToken);
+            String playerColor = gameRequest.playerColor();
 
-        if (verifiedAuth == null) {
+            if (verifiedAuth == null) {
+                throw new InvalidAuthTokenException("Invalid auth token");
+            }
+
+            GameData game = gameDAO.getGame(gameRequest);
+
+            if (game == null) {
+                throw new InvalidGameRequestException("Game does not exist");
+            }
+
+            GameData updatedGame;
+
+            if (Objects.equals(playerColor, "WHITE")) {
+                if (game.whiteUsername() == null) {
+                    updatedGame = new GameData(game.gameId(), verifiedAuth.userName(), game.blackUsername(), game.gameName(), game.game());
+                } else {
+                    throw new InvalidGameException("White player already exists");
+                }
+            } else if (Objects.equals(playerColor, "BLACK")) {
+                if (game.blackUsername() == null) {
+                    updatedGame = new GameData(game.gameId(), game.whiteUsername(), verifiedAuth.userName(), game.gameName(), game.game());
+                } else {
+                    throw new InvalidGameException("Black player already exists");
+                }
+            } else {
+                throw new InvalidCredentialsException("Team color must be WHITE or BLACk");
+            }
+
+            gameDAO.joinGame(updatedGame);
+        } catch (DataAccessException e) {
             throw new InvalidAuthTokenException("Invalid auth token");
         }
-
-        GameData game = gameDAO.getGame(gameRequest);
-
-        if (game == null) {
-            throw new InvalidGameRequestException("Game does not exist");
-        }
-
-        GameData updatedGame;
-
-        if (Objects.equals(playerColor, "WHITE")) {
-            if (game.whiteUsername() == null) {
-                updatedGame = new GameData(game.gameId(), verifiedAuth.userName(), game.blackUsername(), game.gameName(), game.game());
-            } else {
-                throw new InvalidGameException("White player already exists");
-            }
-        }
-        else if (Objects.equals(playerColor, "BLACK")) {
-            if (game.blackUsername() == null) {
-                updatedGame = new GameData(game.gameId(), game.whiteUsername(), verifiedAuth.userName(), game.gameName(), game.game());
-            }
-            else {
-                throw new InvalidGameException("Black player already exists");
-            }
-        } else {
-            throw new InvalidCredentialsException("Team color must be WHITE or BLACk");
-        }
-
-        gameDAO.joinGame(updatedGame);
     }
 
     public Collection<ListGamesResult> listGames(String authToken) throws InvalidAuthTokenException {
-        AuthData verifiedAuth = authTokenDAO.verifyAuth(authToken);
-        if (verifiedAuth == null) {
+        try {
+            AuthData verifiedAuth = authTokenDAO.verifyAuth(authToken);
+            if (verifiedAuth == null) {
+                throw new InvalidAuthTokenException("Invalid auth token");
+            }
+            Collection<ListGamesResult> games = gameDAO.getGames();
+            return games;
+        } catch (DataAccessException e) {
             throw new InvalidAuthTokenException("Invalid auth token");
         }
-        Collection<ListGamesResult> games = gameDAO.getGames();
-        return games;
     }
 
     public class InvalidAuthTokenException extends Exception {

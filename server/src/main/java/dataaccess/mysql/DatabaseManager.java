@@ -117,7 +117,6 @@ public class DatabaseManager {
               `blackUsername` varchar(256) DEFAULT NULL,
               `gameName` varchar(256) NOT NULL,
               `jsonChessGame` TEXT DEFAULT NULL,
-              `json` TEXT DEFAULT NULL,
               PRIMARY KEY (`gameId`)
             )
             """

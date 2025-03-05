@@ -8,7 +8,7 @@ import model.GameData;
 import java.util.Collection;
 
 public interface GameDAO {
-    CreateGameResult createGame(String gameName);
+    CreateGameResult createGame(String gameName) throws DataAccessException;
     GameData getGame(JoinGameRequest gameRequest);
     void joinGame(GameData updatedGame);
     Collection<ListGamesResult> getGames();
