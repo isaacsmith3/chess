@@ -30,17 +30,20 @@ public class MySQLUserDAO implements UserDAO {
     }
 
     @Override
-    public UserData getUser(String userName) {
+    public UserData getUser(String username) {
         try (Connection conn = databaseManager.getConnection()) {
-            var SQLStatement = "SELECT username, password, email FROM users WHERE username = ?";
-            try (PreparedStatement ps = conn.prepareStatement(SQLStatement)) {
-                ps.setString(1, userName);
+            String sql = "SELECT username, password, email FROM users WHERE username = ?";
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setString(1, username);
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next()) {
-                        return new UserData(rs.getString("username"), rs.getString("password"), rs.getString("email"));
-                    } else {
-                        return null;
+                        return new UserData(
+                                rs.getString("username"),
+                                rs.getString("password"),
+                                rs.getString("email")
+                        );
                     }
+                    return null;
                 }
             }
         } catch (SQLException | DataAccessException e) {

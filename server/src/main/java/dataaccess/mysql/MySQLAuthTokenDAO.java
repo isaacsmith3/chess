@@ -19,7 +19,7 @@ public class MySQLAuthTokenDAO implements AuthTokenDAO {
 
     @Override
     public void createAuth(AuthData authData) throws DataAccessException {
-        var SQLStatement = "INSERT INTO auths (username, authToken) VALUES (?, ?)";
+        var SQLStatement = "INSERT INTO auths (authToken, username) VALUES (?, ?)";
         databaseManager.executeUpdate(SQLStatement, authData.authToken(), authData.userName());
     }
 
@@ -30,15 +30,22 @@ public class MySQLAuthTokenDAO implements AuthTokenDAO {
 
     @Override
     public String deleteAuth(String auth) throws DataAccessException {
-//        try (Connection conn = databaseManager.getConnection()) {
-//            var SQLStatement = "DELETE FROM auth_token WHERE user_id = ? AND token = ?";
-//
-//        } catch (SQLException e) {
-//            throw new DataAccessException(e.getMessage());
-//        } catch (DataAccessException e) {
-//            throw new RuntimeException(e);
-//        }
-
+        try (Connection conn = databaseManager.getConnection()) {
+            var SQLStatement = "DELETE FROM auths WHERE authToken = ?";
+            try (PreparedStatement ps = conn.prepareStatement(SQLStatement)) {
+                ps.setString(1, auth);
+                int rowsAffected = ps.executeUpdate();
+                if (rowsAffected == 0) {
+                    throw new DataAccessException("Error: unauthorized");
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
         return "";
     }
 
@@ -49,7 +56,7 @@ public class MySQLAuthTokenDAO implements AuthTokenDAO {
 
     @Override
     public void clear() {
-
+        var SQLStatement = "DELETE FROM auths";
     }
 
     @Override

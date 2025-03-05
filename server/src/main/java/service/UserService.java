@@ -3,6 +3,7 @@ package service;
 import dataaccess.AuthTokenDAO;
 import dataaccess.DataAccessException;
 import dataaccess.UserDAO;
+import org.mindrot.jbcrypt.BCrypt;
 import types.AuthResult;
 import model.AuthData;
 import model.UserData;
@@ -29,6 +30,8 @@ public class UserService {
 
             UserData existingUser = userDAO.getUser(request.username());
 
+
+
             if (existingUser != null) {
                 throw new DuplicateUserException("Username already exists");
             }
@@ -54,13 +57,19 @@ public class UserService {
 
             UserData existingUser = userDAO.getUser(request.username());
 
+            // This may break for memoryDAO
+            if (!verifyPassword(request.password(), existingUser) ) {
+                throw new InvalidCredentialsException("Invalid password");
+            }
+
             if (existingUser == null) {
                 throw new InvalidCredentialsException("Username not found");
             }
 
-            if (!request.password().equals(existingUser.password())) {
-                throw new InvalidCredentialsException("Passwords do not match");
-            }
+            // For memoryDAO
+//            if (!request.password().equals(existingUser.password())) {
+//                throw new InvalidCredentialsException("Passwords do not match");
+//            }
 
             String authToken = UUID.randomUUID().toString();
             AuthData authData = new AuthData(authToken, request.username());
@@ -94,6 +103,11 @@ public class UserService {
 
     public class InvalidCredentialsException extends Exception {
         public InvalidCredentialsException(String message) { super(message); }
+    }
+
+    public boolean verifyPassword(String rawPassword, UserData storedUser) {
+        if (storedUser == null) return false;
+        return BCrypt.checkpw(rawPassword, storedUser.password());
     }
 
 }
