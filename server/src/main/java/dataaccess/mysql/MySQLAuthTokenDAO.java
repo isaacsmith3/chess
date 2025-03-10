@@ -7,6 +7,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MySQLAuthTokenDAO implements AuthTokenDAO {
 
@@ -35,10 +37,8 @@ public class MySQLAuthTokenDAO implements AuthTokenDAO {
             } catch (SQLException e) {
                 throw new DataAccessException("Error: unauthorized");
             }
-        } catch (SQLException e) {
+        } catch (SQLException | DataAccessException e) {
             throw new DataAccessException(e.getMessage());
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e);
         }
         return "";
     }
@@ -77,6 +77,19 @@ public class MySQLAuthTokenDAO implements AuthTokenDAO {
 
     @Override
     public Object getAuthTokens() {
-        return null;
+        try (Connection conn = databaseManager.getConnection()) {
+            var sql = "SELECT * FROM auths";
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                try (ResultSet rs = ps.executeQuery()) {
+                    List<AuthData> auths = new ArrayList<>();
+                    while (rs.next()) {
+                        auths.add(new AuthData(rs.getString("authToken"), rs.getString("username")));
+                    }
+                    return auths;
+                }
+            }
+        } catch (SQLException | DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
