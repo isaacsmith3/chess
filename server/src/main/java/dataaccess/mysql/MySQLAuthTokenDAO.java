@@ -1,11 +1,8 @@
 package dataaccess.mysql;
 
-import com.google.gson.Gson;
 import dataaccess.AuthTokenDAO;
 import dataaccess.DataAccessException;
 import model.AuthData;
-import model.UserData;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
