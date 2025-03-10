@@ -19,10 +19,12 @@ public class Server {
 
         MySQLAuthTokenDAO SQLauthTokenDAO;
         MySQLUserDAO SQLuserDAO;
+        MySQLGameDAO SQLgameDAO;
 
         try {
             SQLauthTokenDAO = new MySQLAuthTokenDAO();
             SQLuserDAO = new MySQLUserDAO();
+            SQLgameDAO = new MySQLGameDAO();
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
@@ -36,17 +38,17 @@ public class Server {
             Spark.delete("/db", (request, response) -> {
                 SQLuserDAO.clear();
                 SQLauthTokenDAO.clear();
-                gameDAO.clear();
+                SQLgameDAO.clear();
                 response.status(200);
                 return "";
             });
-            Spark.delete("/db", (request, response) -> (new ClearHandler(SQLuserDAO, SQLauthTokenDAO, gameDAO).clear(request, response)));
+            Spark.delete("/db", (request, response) -> (new ClearHandler(SQLuserDAO, SQLauthTokenDAO, SQLgameDAO).clear(request, response)));
             Spark.post("/user", (request, response) -> (new RegisterHandler(SQLuserDAO, SQLauthTokenDAO).register(request, response)));
             Spark.post("/session", (request, response) -> (new LoginHandler(SQLuserDAO, SQLauthTokenDAO).login(request, response)));
             Spark.delete("/session", (request, response) -> (new LogoutHandler(SQLuserDAO, SQLauthTokenDAO).logout(request, response)));
-            Spark.get("/game", (request, response) -> (new ListGamesHandler(gameDAO, SQLauthTokenDAO).listGames(request, response)));
-            Spark.post("/game", (request, response) -> (new CreateGameHandler(gameDAO, SQLauthTokenDAO).createGame(request, response)));
-            Spark.put("/game", (request, response) -> (new JoinGameHandler(gameDAO, SQLauthTokenDAO).joinGame(request, response)));
+            Spark.get("/game", (request, response) -> (new ListGamesHandler(SQLgameDAO, SQLauthTokenDAO).listGames(request, response)));
+            Spark.post("/game", (request, response) -> (new CreateGameHandler(SQLgameDAO, SQLauthTokenDAO).createGame(request, response)));
+            Spark.put("/game", (request, response) -> (new JoinGameHandler(SQLgameDAO, SQLauthTokenDAO).joinGame(request, response)));
 
         } catch (Exception e) {
             throw new RuntimeException(e);

@@ -32,7 +32,7 @@ public class MemoryGameDAO implements GameDAO {
     @Override
     public GameData getGame(JoinGameRequest gameRequest) {
         for (GameData game : gameDataCollection) {
-            if (game.gameId() == gameRequest.gameID()) {
+            if (game.gameID() == gameRequest.gameID()) {
                 return game;
             }
         }
@@ -42,7 +42,7 @@ public class MemoryGameDAO implements GameDAO {
     @Override
     public void joinGame(GameData updatedGame) {
         for (GameData game : gameDataCollection) {
-            if (game.gameId() == updatedGame.gameId()) {
+            if (game.gameID() == updatedGame.gameID()) {
                 gameDataCollection.remove(game);
                 gameDataCollection.add(updatedGame);
                 return;
@@ -54,7 +54,7 @@ public class MemoryGameDAO implements GameDAO {
     public Collection<ListGamesResult> getGames() {
         return gameDataCollection.stream().map(
                 game ->
-                        new ListGamesResult(game.gameId(), game.whiteUsername(), game.blackUsername(), game.gameName())).collect(Collectors.toList());
+                        new ListGamesResult(game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName())).collect(Collectors.toList());
     }
 
     @Override
