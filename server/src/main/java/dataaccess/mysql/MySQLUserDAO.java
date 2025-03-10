@@ -24,8 +24,8 @@ public class MySQLUserDAO implements UserDAO {
     public void createUser(UserData userData) throws DataAccessException {
         String hashedPassword = BCrypt.hashpw(userData.password(), BCrypt.gensalt());
         userData = new UserData(userData.username(), hashedPassword, userData.email());
-        var statement = "INSERT INTO users (username, password, email) VALUES (?, ?, ?)";
-        databaseManager.executeUpdate(statement, userData.username(), userData.password(), userData.email());
+        var sql = "INSERT INTO users (username, password, email) VALUES (?, ?, ?)";
+        databaseManager.executeUpdate(sql, userData.username(), userData.password(), userData.email());
     }
 
     @Override
@@ -53,8 +53,8 @@ public class MySQLUserDAO implements UserDAO {
     @Override
     public void clear() {
         try {
-            var SQLStatement = "DELETE FROM users";
-            databaseManager.executeUpdate(SQLStatement);
+            var sql = "DELETE FROM users";
+            databaseManager.executeUpdate(sql);
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }

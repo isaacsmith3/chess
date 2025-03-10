@@ -21,15 +21,15 @@ public class MySQLAuthTokenDAO implements AuthTokenDAO {
 
     @Override
     public void createAuth(AuthData authData) throws DataAccessException {
-        var SQLStatement = "INSERT INTO auths (authToken, username) VALUES (?, ?)";
-        databaseManager.executeUpdate(SQLStatement, authData.authToken(), authData.userName());
+        var sql = "INSERT INTO auths (authToken, username) VALUES (?, ?)";
+        databaseManager.executeUpdate(sql, authData.authToken(), authData.userName());
     }
 
     @Override
     public String deleteAuth(String auth) throws DataAccessException {
         try (Connection conn = databaseManager.getConnection()) {
-            var SQLStatement = "DELETE FROM auths WHERE authToken = ?";
-            try (PreparedStatement ps = conn.prepareStatement(SQLStatement)) {
+            var sql = "DELETE FROM auths WHERE authToken = ?";
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
                 ps.setString(1, auth);
                 int rowsAffected = ps.executeUpdate();
                 if (rowsAffected == 0) {
@@ -49,8 +49,8 @@ public class MySQLAuthTokenDAO implements AuthTokenDAO {
     @Override
     public AuthData verifyAuth(String auth) throws DataAccessException {
         try (Connection conn = databaseManager.getConnection()) {
-            var SQLStatement = "SELECT * FROM auths WHERE authToken = ?";
-            try (PreparedStatement ps = conn.prepareStatement(SQLStatement)) {
+            var sql = "SELECT * FROM auths WHERE authToken = ?";
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
                 ps.setString(1, auth);
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next()) {
@@ -71,8 +71,8 @@ public class MySQLAuthTokenDAO implements AuthTokenDAO {
     @Override
     public void clear() {
         try {
-            var SQLStatement = "DELETE FROM auths";
-            databaseManager.executeUpdate(SQLStatement);
+            var sql = "DELETE FROM auths";
+            databaseManager.executeUpdate(sql);
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }

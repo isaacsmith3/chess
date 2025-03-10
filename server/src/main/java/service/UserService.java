@@ -66,10 +66,7 @@ public class UserService {
                 throw new InvalidCredentialsException("Username not found");
             }
 
-            // For memoryDAO
-//            if (!request.password().equals(existingUser.password())) {
-//                throw new InvalidCredentialsException("Passwords do not match");
-//            }
+            // For memoryDAO if (!request.password().equals(existingUser.password()) throw new InvalidCredentialsException("Passwords do not match"); }
 
             String authToken = UUID.randomUUID().toString();
             AuthData authData = new AuthData(authToken, request.username());
@@ -106,7 +103,9 @@ public class UserService {
     }
 
     public boolean verifyPassword(String rawPassword, UserData storedUser) {
-        if (storedUser == null) return false;
+        if (storedUser == null) {
+            return false;
+        };
         return BCrypt.checkpw(rawPassword, storedUser.password());
     }
 

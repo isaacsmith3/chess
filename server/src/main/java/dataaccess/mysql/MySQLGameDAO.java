@@ -28,16 +28,16 @@ public class MySQLGameDAO implements GameDAO {
         int newGameID = gameIdCounter.getAndIncrement();
         GameData game = new GameData(newGameID, null, null, gameName, new ChessGame());
         var jsonChess = new Gson().toJson(game);
-        var SQLStatement = "INSERT INTO games (gameID, whiteUsername, blackUsername, gameName, jsonChessGame) VALUES (?, ?, ?, ?, ?) ";
-        databaseManager.executeUpdate(SQLStatement, game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName(), jsonChess);
+        var sql = "INSERT INTO games (gameID, whiteUsername, blackUsername, gameName, jsonChessGame) VALUES (?, ?, ?, ?, ?) ";
+        databaseManager.executeUpdate(sql, game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName(), jsonChess);
         return new CreateGameResult(newGameID);
     }
 
     @Override
     public GameData getGame(JoinGameRequest gameRequest) {
         try (Connection conn = databaseManager.getConnection()) {
-            String SQLStatement = "SELECT gameId, whiteUsername, blackUsername, gameName, jsonChessGame FROM games WHERE gameId = ?";
-            try (PreparedStatement ps = conn.prepareStatement(SQLStatement)) {
+            String sql = "SELECT gameId, whiteUsername, blackUsername, gameName, jsonChessGame FROM games WHERE gameId = ?";
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
                 ps.setString(1, String.valueOf(gameRequest.gameID()));
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next()) {
@@ -61,9 +61,9 @@ public class MySQLGameDAO implements GameDAO {
     @Override
     public void joinGame(GameData updatedGame) {
         try (Connection conn = databaseManager.getConnection()) {
-            String SQLStatement = "UPDATE games SET whiteUserName = ?, blackUserName = ?, jsonChessGame = ? WHERE gameID = ?";
+            String sql = "UPDATE games SET whiteUserName = ?, blackUserName = ?, jsonChessGame = ? WHERE gameID = ?";
 
-            try (PreparedStatement ps = conn.prepareStatement(SQLStatement)) {
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
                 if (updatedGame.whiteUsername() == null) {
                     ps.setNull(1, Types.VARCHAR);
                 } else {
@@ -109,8 +109,8 @@ public class MySQLGameDAO implements GameDAO {
     @Override
     public void clear() {
         try {
-            var SQLStatement = "DELETE FROM games";
-            databaseManager.executeUpdate(SQLStatement);
+            var sql = "DELETE FROM games";
+            databaseManager.executeUpdate(sql);
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }

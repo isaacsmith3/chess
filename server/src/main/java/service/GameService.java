@@ -35,7 +35,8 @@ public class GameService {
         }
     }
 
-    public void joinGame(String authToken, JoinGameRequest gameRequest) throws InvalidAuthTokenException, InvalidGameException, InvalidCredentialsException, InvalidGameRequestException {
+    public void joinGame(String authToken, JoinGameRequest gameRequest)
+            throws InvalidAuthTokenException, InvalidGameException, InvalidCredentialsException, InvalidGameRequestException {
         try {
             AuthData verifiedAuth = authTokenDAO.verifyAuth(authToken);
             String playerColor = gameRequest.playerColor();
