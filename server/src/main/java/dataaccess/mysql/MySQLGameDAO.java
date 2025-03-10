@@ -118,6 +118,19 @@ public class MySQLGameDAO implements GameDAO {
 
     @Override
     public Collection<GameData> getAllGames() {
-        return List.of();
+        Collection<GameData> games = new ArrayList<>();
+        try (Connection conn = databaseManager.getConnection()) {
+            String sql = "SELECT gameID, whiteUsername, blackUsername, gameName, jsonChessGame FROM games";
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                try (ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        games.add(new Gson().fromJson(rs.getString("jsonChessGame"), GameData.class));
+                    }
+                }
+            }
+        } catch (SQLException | DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+        return games;
     }
 }
