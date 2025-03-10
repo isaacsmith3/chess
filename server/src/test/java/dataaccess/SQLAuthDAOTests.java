@@ -84,10 +84,16 @@ public class SQLAuthDAOTests {
     @Test
     public void positiveTestGetAuthTokens() throws DataAccessException {
         AuthData authData = new AuthData("testuser", "password");
+        AuthData authData2 = new AuthData("testuser2", "password2");
+        AuthData authData3 = new AuthData("testuser3", "password3");
         mySQLAuthDAO.createAuth(authData);
+        mySQLAuthDAO.createAuth(authData2);
+        mySQLAuthDAO.createAuth(authData3);
         Collection<AuthData> auths = (Collection<AuthData>) mySQLAuthDAO.getAuthTokens();
-        Assertions.assertEquals(1, auths.size());
-        Assertions.assertEquals(authData, auths.iterator().next());
+        Assertions.assertEquals(3, auths.size());
+        Assertions.assertTrue(auths.contains(authData));
+        Assertions.assertTrue(auths.contains(authData2));
+        Assertions.assertTrue(auths.contains(authData3));
     }
 
     @Test
