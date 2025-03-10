@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import org.mindrot.jbcrypt.BCrypt;
@@ -62,6 +63,23 @@ public class MySQLUserDAO implements UserDAO {
 
     @Override
     public Collection<UserData> getAllUsers() {
-        return List.of();
+        try (Connection conn = databaseManager.getConnection()) {
+            String sql = "SELECT username, password, email FROM users";
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                try (ResultSet rs = ps.executeQuery()) {
+                    List<UserData> users = new ArrayList<>();
+                    while (rs.next()) {
+                        users.add(new UserData(
+                                rs.getString("username"),
+                                rs.getString("password"),
+                                rs.getString("email")
+                        ));
+                    }
+                    return users;
+                }
+            }
+        } catch (SQLException | DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
