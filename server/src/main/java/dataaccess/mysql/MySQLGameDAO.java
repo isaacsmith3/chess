@@ -90,8 +90,8 @@ public class MySQLGameDAO implements GameDAO {
     public Collection<ListGamesResult> getGames() {
         Collection<ListGamesResult> games = new ArrayList<>();
         try (Connection conn = databaseManager.getConnection()) {
-            String SQLStatement = "SELECT gameID, gameName, jsonChessGame FROM games";
-            try (PreparedStatement ps = conn.prepareStatement(SQLStatement)) {
+            String sql = "SELECT gameID, gameName, jsonChessGame FROM games";
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
                 try (ResultSet rs = ps.executeQuery()) {
                     while (rs.next()) {
                         ListGamesResult game = new Gson().fromJson(rs.getString("jsonChessGame"), ListGamesResult.class);
