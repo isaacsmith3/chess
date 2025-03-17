@@ -2,6 +2,11 @@ package server;
 
 import com.google.gson.Gson;
 import exception.ResponseException;
+import model.UserData;
+import types.AuthResult;
+import types.CreateGameResult;
+import types.JoinGameRequest;
+import types.ListGamesResult;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,6 +15,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.util.Collection;
 
 public class ServerFacade {
 
@@ -19,12 +25,51 @@ public class ServerFacade {
         this.serverUrl = serverUrl;
     }
 
-    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException {
+    public AuthResult register(UserData request) throws ResponseException {
+        var path = "/user";
+        return this.makeRequest("POST", path, request, AuthResult.class, null);
+    }
+
+    public AuthResult login(UserData request) throws ResponseException {
+        var path = "/session";
+        return this.makeRequest("POST", path, request, AuthResult.class, null);
+    }
+
+    public CreateGameResult createGame(String request, String authToken) throws ResponseException {
+        var path = "/game";
+        return this.makeRequest("POST", path, request, CreateGameResult.class, authToken);
+    }
+
+    public void joinGame(JoinGameRequest request, String authToken) throws ResponseException {
+        var path = "/game";
+        this.makeRequest("PUT", path, request, AuthResult.class, authToken);
+    }
+
+    public Collection<ListGamesResult> listGames(String authToken) throws ResponseException {
+        var path = "/game";
+        return (Collection<ListGamesResult>) this.makeRequest("GET", path, null, Object.class, authToken);
+    }
+
+    public void logout(String authToken) throws ResponseException {
+        var path = "/session";
+        this.makeRequest("DELETE", path, null , Object.class, authToken);
+    }
+
+    public void clear() throws ResponseException {
+        var path = "/db";
+        this.makeRequest("DELETE", path, null, Object.class, null);
+    }
+
+
+
+    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass, String header) throws ResponseException {
         try {
             URL url = (new URI(serverUrl + path)).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod(method);
             http.setDoOutput(true);
+
+            http.setRequestProperty("authorization", header);
 
             writeBody(request, http);
             http.connect();
