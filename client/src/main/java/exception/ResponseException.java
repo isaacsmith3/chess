@@ -15,10 +15,6 @@ public class ResponseException extends Exception {
         this.statusCode = statusCode;
     }
 
-    public String toJson() {
-        return new Gson().toJson(Map.of("message", getMessage(), "status", statusCode));
-    }
-
     /// TODO: fix styling
     public static ResponseException fromJson(InputStream stream) {
         var map = new Gson().fromJson(new InputStreamReader(stream), HashMap.class);
@@ -46,10 +42,5 @@ public class ResponseException extends Exception {
         }
 
         return new ResponseException(status, message);
-    }
-
-
-    public int StatusCode() {
-        return statusCode;
     }
 }

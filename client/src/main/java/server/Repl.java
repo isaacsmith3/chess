@@ -12,7 +12,7 @@ public class Repl {
 
     public Repl(String serverUrl) {
         this.preLoginClient = new PreLoginClient(serverUrl);
-        this.postLoginClient = new PostLoginClient();
+        this.postLoginClient = new PostLoginClient(serverUrl);
         this.gameClient = new GameClient();
     }
 
@@ -25,9 +25,12 @@ public class Repl {
 
         State currentState = State.PRE_LOGIN;
 
-        while (!input.equals("quit")) {
+        while (true) {
             printPrompt();
             input = scanner.nextLine();
+            if (input.equalsIgnoreCase("quit")) {
+                break;
+            }
 
             try {
                 switch (currentState) {
@@ -37,12 +40,16 @@ public class Repl {
 
                         if (authToken != null) {
                             currentState = State.POST_LOGIN;
-//                            postLoginClient.setAuthToken()
+                            postLoginClient.setAuthToken(authToken);
                             System.out.println(parsedResult[0]);
-//                            System.out.println(postLoginClient.help());
+                            System.out.println(postLoginClient.help());
                         } else {
                             System.out.println(result);
                         }
+                        break;
+                    case POST_LOGIN:
+                        result = postLoginClient.eval(input);
+                        System.out.println(result);
                 }
             } catch (Exception e) {
                 System.out.println("Error: " + e.getMessage());

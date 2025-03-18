@@ -36,7 +36,7 @@ public class PreLoginClient {
 
 
         }
-        return null;
+        return "Invalid command";
     }
 
     public String help() {
@@ -54,16 +54,6 @@ public class PreLoginClient {
         return "quit";
     }
 
-    public String login(String username, String password) {
-        try {
-            UserData userData = new UserData(username, password, null);
-            AuthResult authResult = serverFacade.login(userData);
-            return "AUTH_TOKEN:" + authResult.authToken() + ":Successfully Logged In ";
-        } catch (ResponseException e) {
-            return "ERROR:" + e.getMessage();
-        }
-    }
-
     public String register(String username, String password, String email) {
         try {
             UserData userData = new UserData(username, password, email);
@@ -71,6 +61,16 @@ public class PreLoginClient {
             return "AUTH_TOKEN:" + authResult.authToken() + ":Successfully Registered and Logged In ";
         } catch (ResponseException e) {
             return "Error: " + e.getMessage();
+        }
+    }
+
+    public String login(String username, String password) {
+        try {
+            UserData userData = new UserData(username, password, null);
+            AuthResult authResult = serverFacade.login(userData);
+            return "AUTH_TOKEN:" + authResult.authToken() + ":Successfully Logged In ";
+        } catch (ResponseException e) {
+            return "ERROR:" + e.getMessage();
         }
     }
 
