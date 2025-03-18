@@ -1,4 +1,3 @@
-import chess.*;
 import server.Repl;
 
 public class Main {
@@ -9,6 +8,5 @@ public class Main {
         }
 
         new Repl(serverUrl).run();
-
     }
 }
