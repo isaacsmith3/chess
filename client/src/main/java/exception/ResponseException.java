@@ -19,12 +19,35 @@ public class ResponseException extends Exception {
         return new Gson().toJson(Map.of("message", getMessage(), "status", statusCode));
     }
 
+    /// TODO: fix styling
     public static ResponseException fromJson(InputStream stream) {
         var map = new Gson().fromJson(new InputStreamReader(stream), HashMap.class);
-        var status = ((Double)map.get("status")).intValue();
-        String message = map.get("message").toString();
+        int status = 500;
+        if (map.containsKey("status") && map.get("status") != null) {
+            try {
+                status = ((Double)map.get("status")).intValue();
+            } catch (ClassCastException e) {
+                Object statusObj = map.get("status");
+                if (statusObj instanceof Number) {
+                    status = ((Number)statusObj).intValue();
+                } else if (statusObj instanceof String) {
+                    try {
+                        status = Integer.parseInt((String)statusObj);
+                    } catch (NumberFormatException nfe) {
+                        return new ResponseException(status, "Invalid status code");
+                    }
+                }
+            }
+        }
+
+        String message = "Unknown error";
+        if (map.containsKey("message") && map.get("message") != null) {
+            message = map.get("message").toString();
+        }
+
         return new ResponseException(status, message);
     }
+
 
     public int StatusCode() {
         return statusCode;

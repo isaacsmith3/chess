@@ -8,6 +8,7 @@ public class Repl {
     private final PreLoginClient preLoginClient;
     private final PostLoginClient postLoginClient;
     private final GameClient gameClient;
+    private String authToken = null;
 
     public Repl(String serverUrl) {
         this.preLoginClient = new PreLoginClient(serverUrl);
@@ -24,8 +25,6 @@ public class Repl {
 
         State currentState = State.PRE_LOGIN;
 
-        String authToken = null;
-
         while (!input.equals("quit")) {
             printPrompt();
             input = scanner.nextLine();
@@ -34,14 +33,19 @@ public class Repl {
                 switch (currentState) {
                     case PRE_LOGIN:
                         String result = preLoginClient.eval(input);
-                        if (result.startsWith("AUTH_TOKEN:")) {
-                            System.out.println("Do something");
+                        String[] parsedResult = parseAuthMessage(result);
+
+                        if (authToken != null) {
+                            currentState = State.POST_LOGIN;
+//                            postLoginClient.setAuthToken()
+                            System.out.println(parsedResult[0]);
+//                            System.out.println(postLoginClient.help());
+                        } else {
+                            System.out.println(result);
                         }
-                        System.out.println(result);
                 }
             } catch (Exception e) {
                 System.out.println("Error: " + e.getMessage());
-                throw new RuntimeException(e);
             }
         }
 
@@ -49,6 +53,26 @@ public class Repl {
 
     private void printPrompt() {
         System.out.print("\n" + ">>> ");
+    }
+
+    private String[] parseAuthMessage(String message) {
+        if (message.startsWith("AUTH_TOKEN:")) {
+            String[] parts = message.split(":", 4);
+
+            if (parts.length >= 2) {
+                this.authToken = parts[1].trim();
+
+                if (parts.length >= 3) {
+                    return new String[]{parts[2].trim()};
+                } else {
+                    return new String[]{"Login successful"};
+                }
+            } else {
+                return new String[]{"Received auth token but with unexpected format"};
+            }
+        } else {
+            return new String[]{message};
+        }
     }
 
 }

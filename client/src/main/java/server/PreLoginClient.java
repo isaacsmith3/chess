@@ -28,6 +28,12 @@ public class PreLoginClient {
                     return "Usage: register <username> <password> <email>";
                 }
                 return register(tokens[1], tokens[2], tokens[3]);
+            case "login":
+                if (tokens.length < 2) {
+                    return "Usage: login <username> <password>";
+                }
+                return login(tokens[1], tokens[2]);
+
 
         }
         return null;
@@ -35,7 +41,7 @@ public class PreLoginClient {
 
     public String help() {
         var output = new StringBuilder();
-        output.append("Help menu:\n");
+        output.append("Help Menu:\n");
         output.append("help - print this message again :)\n");
         output.append("register - make an account\n");
         output.append("login - login to your account\n");
@@ -45,18 +51,24 @@ public class PreLoginClient {
     }
 
     public String quit() {
-        return "Quit";
+        return "quit";
     }
 
     public String login(String username, String password) {
-        return "login";
+        try {
+            UserData userData = new UserData(username, password, null);
+            AuthResult authResult = serverFacade.login(userData);
+            return "AUTH_TOKEN:" + authResult.authToken() + ":Successfully Logged In ";
+        } catch (ResponseException e) {
+            return "ERROR:" + e.getMessage();
+        }
     }
 
     public String register(String username, String password, String email) {
         try {
             UserData userData = new UserData(username, password, email);
             AuthResult authResult = serverFacade.register(userData);
-            return "AUTH_TOKEN: " + authResult.authToken() + " Successfully Registered";
+            return "AUTH_TOKEN:" + authResult.authToken() + ":Successfully Registered and Logged In ";
         } catch (ResponseException e) {
             return "Error: " + e.getMessage();
         }
