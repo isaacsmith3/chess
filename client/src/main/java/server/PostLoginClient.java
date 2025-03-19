@@ -1,5 +1,7 @@
 package server;
 
+import exception.ResponseException;
+
 public class PostLoginClient {
     private final ServerFacade serverFacade;
     private String authToken;
@@ -16,7 +18,7 @@ public class PostLoginClient {
         var output = new StringBuilder();
         output.append("Help Menu:\n");
         output.append("help - print this message again :)\n");
-        output.append("logout - logout of your account :)\n");
+        output.append("logout - logout of your account\n");
         output.append("create <NAME> - create a new game\n");
         output.append("list - list all games\n");
         output.append("play - exit the program\n");
@@ -34,9 +36,18 @@ public class PostLoginClient {
             case "help":
                 return help();
             case "logout":
-                return "lougout";
+                return logout(authToken);
         }
         return "Invalid command";
+    }
+
+    public String logout(String authToken) {
+        try {
+            serverFacade.logout(authToken);
+            return "Logged Out Successfully";
+        } catch (ResponseException e) {
+            return "Error: " + e.getMessage();
+        }
     }
 
 

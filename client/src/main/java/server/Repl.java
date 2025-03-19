@@ -49,7 +49,14 @@ public class Repl {
                         break;
                     case POST_LOGIN:
                         result = postLoginClient.eval(input);
-                        System.out.println(result);
+                        if (input.equalsIgnoreCase("logout")) {
+                            this.authToken = null;
+                            currentState = State.PRE_LOGIN;
+                            System.out.println(result);
+                        } else {
+                            System.out.println(result);
+                        }
+                        break;
                 }
             } catch (Exception e) {
                 System.out.println("Error: " + e.getMessage());
