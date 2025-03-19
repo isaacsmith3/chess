@@ -1,7 +1,6 @@
 package server;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import exception.ResponseException;
 import model.UserData;
 import types.*;
@@ -14,7 +13,6 @@ import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Collection;
 
 public class ServerFacade {
@@ -35,9 +33,10 @@ public class ServerFacade {
         return this.makeRequest("POST", path, request, AuthResult.class, null);
     }
 
-    public CreateGameResult createGame(String request, String authToken) throws ResponseException {
+    public CreateGameResult createGame(String gameName, String authToken) throws ResponseException {
         var path = "/game";
-        return this.makeRequest("POST", path, request, CreateGameResult.class, authToken);
+        CreateGameRequest requestObject = new CreateGameRequest(gameName);
+        return this.makeRequest("POST", path, requestObject, CreateGameResult.class, authToken);
     }
 
     public void joinGame(JoinGameRequest request, String authToken) throws ResponseException {

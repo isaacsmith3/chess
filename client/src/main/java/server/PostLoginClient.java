@@ -42,6 +42,12 @@ public class PostLoginClient {
                 return logout(authToken);
             case "list":
                 return list();
+            case "create":
+                if (tokens.length < 2) {
+                    return "Usage: create <NAME>";
+                }
+                return createGame(tokens[1], authToken);
+
         }
         return "Invalid command";
     }
@@ -80,6 +86,15 @@ public class PostLoginClient {
             output.append("--------------------------------------------------------------\n");
 
             return output.toString();
+        } catch (ResponseException e) {
+            return "Error: " + e.getMessage();
+        }
+    }
+
+    public String createGame(String gameName, String authToken) {
+        try {
+            serverFacade.createGame(gameName, authToken);
+            return gameName + " Game Created Successfully";
         } catch (ResponseException e) {
             return "Error: " + e.getMessage();
         }
