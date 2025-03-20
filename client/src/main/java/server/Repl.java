@@ -29,6 +29,9 @@ public class Repl {
             printPrompt();
             input = scanner.nextLine();
             if (input.equalsIgnoreCase("quit")) {
+                if (authToken != null) {
+                    postLoginClient.eval("logout");
+                }
                 break;
             }
 
@@ -52,6 +55,9 @@ public class Repl {
                         if (input.equalsIgnoreCase("logout")) {
                             this.authToken = null;
                             currentState = State.PRE_LOGIN;
+                            System.out.println(result);
+                        } else if (input.startsWith("join") || input.startsWith("observe")) {
+                            currentState = State.GAME;
                             System.out.println(result);
                         } else {
                             System.out.println(result);
