@@ -7,13 +7,15 @@ enum State { PRE_LOGIN, POST_LOGIN, GAME }
 public class Repl {
     private final PreLoginClient preLoginClient;
     private final PostLoginClient postLoginClient;
-    private final GameClient gameClient;
+    private GameClient gameClient;
     private String authToken = null;
+    private String serverUrl;
 
     public Repl(String serverUrl) {
         this.preLoginClient = new PreLoginClient(serverUrl);
         this.postLoginClient = new PostLoginClient(serverUrl);
-        this.gameClient = new GameClient();
+        this.gameClient = null;
+        this.serverUrl = serverUrl;
     }
 
     public void run() {
@@ -56,13 +58,24 @@ public class Repl {
                             this.authToken = null;
                             currentState = State.PRE_LOGIN;
                             System.out.println(result);
-                        } else if (input.startsWith("join") || input.startsWith("observe")) {
+                        } else if (input.startsWith("join")) {
+                            String[] tokens = input.split(" ");
+                            String playerColor = tokens[2];
+                            this.gameClient = new GameClient(serverUrl, playerColor);
                             currentState = State.GAME;
                             System.out.println(result);
-                        } else {
+                        } else if (input.startsWith("observe")) {
+                            this.gameClient = new GameClient(serverUrl, null);
+                            currentState = State.GAME;
+                            System.out.println(result);
+                        }
+                        else {
                             System.out.println(result);
                         }
                         break;
+                    case GAME:
+                        result = gameClient.eval(input);
+                        System.out.println(result);
                 }
             } catch (Exception e) {
                 System.out.println("Error: " + e.getMessage());
