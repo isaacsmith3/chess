@@ -59,16 +59,7 @@ public class GameClient {
         boardOutput.append(EscapeSequences.SET_TEXT_COLOR_BLACK);
 
         boardOutput.append("\n");
-        boardOutput.append("  ");
-        for (int col = 0; col < 8; col++) {
-            char file;
-            if (isBlack) {
-                file = (char) ('a' + (7 - col));
-            } else {
-                file = (char) ('a' + col);
-            }
-            boardOutput.append(" ").append(file).append(" ");
-        }
+        printLetters(isBlack, boardOutput);
 
         boardOutput.append("\n");
 
@@ -107,6 +98,17 @@ public class GameClient {
         }
 
         boardOutput.append(EscapeSequences.SET_TEXT_COLOR_BLACK);
+
+        printLetters(isBlack, boardOutput);
+
+        boardOutput.append(EscapeSequences.RESET_BG_COLOR);
+        boardOutput.append(EscapeSequences.RESET_TEXT_COLOR);
+        boardOutput.append("\n");
+
+        return boardOutput.toString();
+    }
+
+    private void printLetters(boolean isBlack, StringBuilder boardOutput) {
         boardOutput.append("  ");
         for (int col = 0; col < 8; col++) {
             char file;
@@ -117,12 +119,6 @@ public class GameClient {
             }
             boardOutput.append(" ").append(file).append(" ");
         }
-
-        boardOutput.append(EscapeSequences.RESET_BG_COLOR);
-        boardOutput.append(EscapeSequences.RESET_TEXT_COLOR);
-        boardOutput.append("\n");
-
-        return boardOutput.toString();
     }
 
     private String getPieceChar(ChessPiece.PieceType type) {
