@@ -60,12 +60,17 @@ public class Repl {
                             System.out.println(result);
                         } else if (input.startsWith("join")) {
                             String[] tokens = input.split(" ");
+                            String gameId = tokens[1];
                             String playerColor = tokens[2];
-                            this.gameClient = new GameClient(serverUrl, playerColor);
+                            this.gameClient = new GameClient(serverUrl, playerColor, gameId);
+                            this.gameClient.setAuthToken(authToken);
                             currentState = State.GAME;
                             System.out.println(result);
                         } else if (input.startsWith("observe")) {
-                            this.gameClient = new GameClient(serverUrl, null);
+                            String[] tokens = input.split(" ");
+                            String gameId = tokens[1];
+                            this.gameClient = new GameClient(serverUrl, null, gameId);
+                            this.gameClient.setAuthToken(authToken);
                             currentState = State.GAME;
                             System.out.println(result);
                         }
@@ -101,7 +106,7 @@ public class Repl {
                     return new String[]{"Login successful"};
                 }
             } else {
-                return new String[]{"Received auth token but with unexpected format"};
+                return new String[]{"Received auth token but with incorrect format"};
             }
         } else {
             return new String[]{message};

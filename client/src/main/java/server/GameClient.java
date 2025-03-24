@@ -1,13 +1,32 @@
 package server;
 
+import chess.ChessBoard;
+import chess.ChessGame;
+import exception.ResponseException;
+import types.ListGamesResult;
+import ui.EscapeSequences;
+
+import java.util.Collection;
+
 public class GameClient {
     private final ServerFacade serverFacade;
     private final String playerColor;
+    private final int gameId;
+    private ChessGame chessGame;
+    private String authToken;
 
-    public GameClient(String serverUrl, String playerColor) {
+    public GameClient(String serverUrl, String playerColor, String gameId) {
         this.serverFacade = new ServerFacade(serverUrl);
         this.playerColor = playerColor;
+        this.gameId = Integer.parseInt(gameId);
+        this.chessGame = new ChessGame();
     }
+
+
+    public void setAuthToken(String authToken) {
+        this.authToken = authToken;
+    }
+
 
     public String eval(String input) {
         String[] tokens = input.split(" ");
@@ -17,7 +36,7 @@ public class GameClient {
             case "help":
                 return help();
             case "draw":
-                return draw(this.playerColor);
+                return drawBoard(this.playerColor, this.chessGame.getBoard());
         }
         return "Invalid command";
     }
@@ -32,8 +51,10 @@ public class GameClient {
         return output.toString();
     }
 
-    public String draw(String playerColor) {
-        return "Viewing board:\n" + playerColor + "\n";
+    public String drawBoard(String playerColor, ChessBoard board) {
+
+        return "BOARD";
     }
+
 
 }
