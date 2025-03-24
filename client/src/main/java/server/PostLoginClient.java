@@ -41,6 +41,11 @@ public class PostLoginClient {
                     return "Usage: join <ID> [WHITE|BLACK]";
                 }
                 return joinGame(tokens[1], tokens[2]);
+            case "observe":
+                if (tokens.length < 3) {
+                    return "Usage: observe <ID>";
+                }
+                return joinGame(tokens[1], null);
 
         }
         return "Invalid command";
