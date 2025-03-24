@@ -7,8 +7,7 @@ import server.Server;
 import server.ServerFacade;
 import types.AuthResult;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class ServerFacadeTests {
@@ -48,6 +47,37 @@ public class ServerFacadeTests {
         assertEquals("testUser", result.username());
     }
 
+    @Test
+    public void testRegisterNegative() throws ResponseException {
+        UserData userData = new UserData("testUser", "password", "test@example.com");
+        AuthResult result = serverFacade.register(userData);
+        assertThrows(ResponseException.class, () -> serverFacade.register(userData));
+    }
 
+    @Test public void testLoginPositive() throws ResponseException {
+        UserData userData = new UserData("testUser", "password", "test@example.com");
+        AuthResult result = serverFacade.register(userData);
+        AuthResult authResult = serverFacade.login(userData);
+        assertNotNull(result.authToken());
+        assertEquals("testUser", result.username());
+    }
 
+    @Test public void testLoginNegative() throws ResponseException {
+        UserData userData = new UserData("testUser", "password", "test@example.com");
+        assertThrows(ResponseException.class, () -> serverFacade.login(userData));
+    }
+
+    @Test public void testLogoutPositive() throws ResponseException {
+        UserData userData = new UserData("testUser", "password", "test@example.com");
+        AuthResult result = serverFacade.register(userData);
+        assertNotNull(result.authToken());
+        serverFacade.logout(result.authToken());
+    }
+
+    @Test public void testLogoutNegative() throws ResponseException {
+        UserData userData = new UserData("testUser", "password", "test@example.com");
+        AuthResult result = serverFacade.register(userData);
+        assertThrows(ResponseException.class, () -> serverFacade.logout("authToken"));
+    }
+    
 }
