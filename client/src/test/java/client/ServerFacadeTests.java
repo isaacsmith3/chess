@@ -100,7 +100,7 @@ public class ServerFacadeTests {
         UserData userData = new UserData("testUser", "password", "test@example.com");
         AuthResult result = serverFacade.register(userData);
         CreateGameResult gameResult = serverFacade.createGame("TestGame", result.authToken());
-        JoinGameRequest request = new JoinGameRequest(1, "WHITE");
+        JoinGameRequest request = new JoinGameRequest(gameResult.gameID(), "WHITE");
         serverFacade.joinGame(request, result.authToken());
         assertNotNull(gameResult.gameID());
     }
