@@ -24,7 +24,7 @@ public class PreLoginClient {
             case "quit":
                 return quit();
             case "register":
-                if (tokens.length < 3) {
+                if (tokens.length != 4) {
                     return "Usage: register <username> <password> <email>";
                 }
                 return register(tokens[1], tokens[2], tokens[3]);

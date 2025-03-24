@@ -47,6 +47,7 @@ public class Repl {
                             currentState = State.POST_LOGIN;
                             postLoginClient.setAuthToken(authToken);
                             System.out.println(parsedResult[0]);
+                            System.out.println("\n");
                             System.out.println(postLoginClient.help());
                         } else {
                             System.out.println(result);
@@ -59,20 +60,32 @@ public class Repl {
                             currentState = State.PRE_LOGIN;
                             System.out.println(result);
                         } else if (input.startsWith("join")) {
-                            String[] tokens = input.split(" ");
-                            String gameId = tokens[1];
-                            String playerColor = tokens[2];
-                            this.gameClient = new GameClient(serverUrl, playerColor, gameId);
-                            this.gameClient.setAuthToken(authToken);
-                            currentState = State.GAME;
-                            System.out.println(result);
+                            if (!result.startsWith("Error:")) {
+                                String[] tokens = input.split(" ");
+                                String gameId = tokens[1];
+                                String playerColor = tokens[2];
+                                this.gameClient = new GameClient(serverUrl, playerColor, gameId);
+                                this.gameClient.setAuthToken(authToken);
+                                currentState = State.GAME;
+                                System.out.println(result);
+                                System.out.println("\n");
+                                System.out.println(gameClient.help());
+                            }
+                            else {
+                                System.out.println(result);
+                            }
                         } else if (input.startsWith("observe")) {
-                            String[] tokens = input.split(" ");
-                            String gameId = tokens[1];
-                            this.gameClient = new GameClient(serverUrl, null, gameId);
-                            this.gameClient.setAuthToken(authToken);
-                            currentState = State.GAME;
-                            System.out.println(result);
+                            if (!result.startsWith("Error:")) {
+                                String[] tokens = input.split(" ");
+                                String gameId = tokens[1];
+                                this.gameClient = new GameClient(serverUrl, null, gameId);
+                                this.gameClient.setAuthToken(authToken);
+                                currentState = State.GAME;
+                                System.out.println(result);
+                            }
+                            else {
+                                System.out.println(result);
+                            }
                         }
                         else {
                             System.out.println(result);

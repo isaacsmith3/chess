@@ -3,9 +3,12 @@ package server;
 import exception.ResponseException;
 import types.ListGamesResult;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import static java.lang.Integer.parseInt;
 
 public class PostLoginClient {
     private final ServerFacade serverFacade;
@@ -32,20 +35,32 @@ public class PostLoginClient {
             case "list":
                 return list();
             case "create":
-                if (tokens.length < 2) {
+                if (tokens.length != 2) {
                     return "Usage: create <NAME>";
                 }
                 return createGame(tokens[1], authToken);
             case "join":
-                if (tokens.length < 3) {
+                if (tokens.length != 3) {
                     return "Usage: join <ID> [WHITE|BLACK]";
                 }
+
+                try {
+                    int gameId = Integer.parseInt(tokens[1]); // Attempt to parse the gameId
+                } catch (NumberFormatException e) {
+                    return "Game ID must be a valid integer.";
+                }
+
+                String color = tokens[2].toUpperCase();
+                if (!color.equals("WHITE") && !color.equals("BLACK")) {
+                    return "Invalid color. Please use WHITE or BLACK.";
+                }
+
                 return joinGame(tokens[1], tokens[2]);
             case "observe":
-                if (tokens.length < 3) {
+                if (tokens.length != 2) {
                     return "Usage: observe <ID>";
                 }
-                return joinGame(tokens[1], null);
+                return joinGame(tokens[1], "WHITE");
 
         }
         return "Invalid command";
@@ -108,7 +123,7 @@ public class PostLoginClient {
     public String createGame(String gameName, String authToken) {
         try {
             serverFacade.createGame(gameName, authToken);
-            return gameName + "Game Created Successfully";
+            return gameName + " Game Created Successfully";
         } catch (ResponseException e) {
             return "Error: " + e.getMessage();
         }
@@ -116,7 +131,7 @@ public class PostLoginClient {
 
     public String joinGame(String gameId, String playerColor) {
         try {
-            int displayedGameId = Integer.parseInt(gameId);
+            int displayedGameId = parseInt(gameId);
 
             if (cachedGames == null || cachedGames.isEmpty()) {
                 Collection<ListGamesResult> gamesCollection = serverFacade.listGames(authToken);
