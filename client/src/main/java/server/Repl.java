@@ -60,11 +60,11 @@ public class Repl {
                             currentState = State.PRE_LOGIN;
                             System.out.println(result);
                         } else if (input.startsWith("join")) {
-                            if (!result.startsWith("Error:")) {
+                            if (!result.startsWith("Error:") && !result.startsWith("Usage:") && !result.startsWith("Invalid") && !result.startsWith("Game")) {
                                 String[] tokens = input.split(" ");
                                 String gameId = tokens[1];
                                 String playerColor = tokens[2];
-                                this.gameClient = new GameClient(serverUrl, playerColor, gameId);
+                                this.gameClient = new GameClient(serverUrl, playerColor, gameId, false);
                                 this.gameClient.setAuthToken(authToken);
                                 currentState = State.GAME;
                                 System.out.println(result);
@@ -75,12 +75,12 @@ public class Repl {
                                 System.out.println(result);
                             }
                         } else if (input.startsWith("observe")) {
-                            if (!result.startsWith("Error:")) {
+                            if (!result.startsWith("Error:") && !result.startsWith("Usage")) {
                                 String[] tokens = input.split(" ");
-                                String gameId = tokens[1];
-                                this.gameClient = new GameClient(serverUrl, null, gameId);
-                                this.gameClient.setAuthToken(authToken);
-                                currentState = State.GAME;
+//                                String gameId = tokens[1];
+//                                this.gameClient = new GameClient(serverUrl, null, gameId, true);
+//                                this.gameClient.setAuthToken(authToken);
+//                                currentState = State.GAME;
                                 System.out.println(result);
                             }
                             else {
@@ -93,6 +93,9 @@ public class Repl {
                         break;
                     case GAME:
                         result = gameClient.eval(input);
+                        if (result.startsWith("Left")) {
+                            currentState = State.POST_LOGIN;
+                        }
                         System.out.println(result);
                 }
             } catch (Exception e) {

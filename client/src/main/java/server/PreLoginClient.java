@@ -29,7 +29,7 @@ public class PreLoginClient {
                 }
                 return register(tokens[1], tokens[2], tokens[3]);
             case "login":
-                if (tokens.length < 2) {
+                if (tokens.length != 3) {
                     return "Usage: login <username> <password>";
                 }
                 return login(tokens[1], tokens[2]);
