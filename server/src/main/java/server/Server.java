@@ -8,6 +8,7 @@ import dataaccess.mysql.MySQLAuthTokenDAO;
 import dataaccess.mysql.MySQLGameDAO;
 import dataaccess.mysql.MySQLUserDAO;
 import handler.*;
+import server.websocket.WebSocketHandler;
 import spark.*;
 
 public class Server {
@@ -20,11 +21,13 @@ public class Server {
         MySQLAuthTokenDAO sqlAuthDao;
         MySQLUserDAO sqlUserDao;
         MySQLGameDAO sqlGameDao;
+        WebSocketHandler webSocketHandler;
 
         try {
             sqlAuthDao = new MySQLAuthTokenDAO();
             sqlUserDao = new MySQLUserDAO();
             sqlGameDao = new MySQLGameDAO();
+            webSocketHandler = new WebSocketHandler(sqlGameDao, sqlAuthDao);
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
@@ -35,6 +38,8 @@ public class Server {
 
         // Register your endpoints and handle exceptions here.
         try {
+            Spark.webSocket("/ws", webSocketHandler);
+
             Spark.delete("/db", (request, response) -> {
                 sqlUserDao.clear();
                 sqlAuthDao.clear();
