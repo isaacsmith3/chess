@@ -18,12 +18,14 @@ public class GameClient {
     private String authToken;
     private boolean isObserving;
 
+
     public GameClient(String serverUrl, String playerColor, String gameId, boolean isObserving) {
         this.serverFacade = new ServerFacade(serverUrl);
         this.playerColor = playerColor;
         this.gameId = Integer.parseInt(gameId);
         this.chessGame = new ChessGame();
         this.isObserving = isObserving;
+
     }
 
     public void setAuthToken(String authToken) {

@@ -20,12 +20,12 @@ public class ConnectionManager {
         connections.remove(visitorName);
     }
 
-    public void broadcast(String excludeAuthToken, ServerMessage msg, int gameId) throws IOException {
+    public void broadcast(String excludeAuthToken, ServerMessage msg, int gameID) throws IOException {
         var removeList = new ArrayList<Connection>();
         for (var c : connections.values()) {
             if (c.session.isOpen()) {
                 if (!c.authToken.equals(excludeAuthToken)) {
-                    if(c.gameId == gameId){
+                    if(c.gameId == gameID){
                         c.send(msg);
                     }
                 }
@@ -39,4 +39,15 @@ public class ConnectionManager {
             connections.remove(c.authToken);
         }
     }
+
+    public void sendMessage(String authToken, ServerMessage message) throws IOException {
+        var c = connections.get(authToken);
+        c.send(message);
+    }
+
+    public void removeSession(Session session) {
+        connections.entrySet().removeIf(entry -> entry.getValue().session.equals(session));
+    }
+
+
 }

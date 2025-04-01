@@ -1,25 +1,35 @@
 package server.websocket;
 
-import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import dataaccess.AuthTokenDAO;
-import dataaccess.DataAccessException;
 import dataaccess.GameDAO;
+import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.*;
 import service.GameService;
+import types.JoinGameRequest;
+import websocket.commands.ConnectCommand;
 import websocket.commands.UserGameCommand;
-
-import java.io.IOException;
+import websocket.messages.LoadGame;
+import websocket.messages.Notification;
+import websocket.messages.ServerMessage;
 
 @WebSocket
 public class WebSocketHandler {
+
+    // Session
 
     private final GameService gameService;
     private final ConnectionManager connectionManager = new ConnectionManager();
 
     public WebSocketHandler(GameDAO gameDAO, AuthTokenDAO authTokenDAO) {
         this.gameService = new GameService(gameDAO, authTokenDAO);
+    }
+
+    @OnWebSocketClose
+    public void onClose(Session session, int statusCode, String reason) {
+        System.out.println("WebSocket connection closed: " + reason);
+        connectionManager.removeSession(session);
     }
 
     @OnWebSocketConnect
@@ -35,10 +45,41 @@ public class WebSocketHandler {
     }
 
     @OnWebSocketMessage
-    public void onMessage(Session session, String message) throws IOException, DataAccessException, InvalidMoveException {
+    public void onMessage(Session session, String message) throws GameService.InvalidAuthTokenException {
         System.out.println("in web socket handler");
         UserGameCommand cmd = new Gson().fromJson(message, UserGameCommand.class);
+        System.out.println(cmd);
+
+        switch (cmd.getCommandType()) {
+            case CONNECT -> connect(new Gson().fromJson(message, ConnectCommand.class), session);
+        }
     }
 
+    private void connect(ConnectCommand cmd, Session session) throws GameService.InvalidAuthTokenException {
+        if (gameService.verifyAuthToken(cmd.getAuthToken())) {
+            connectionManager.add(cmd.getAuthToken(), session, cmd.getGameID());
 
+            try {
+                GameData game = gameService.getGame(new JoinGameRequest(cmd.getGameID(), null));
+                LoadGame loadGameMessage = new LoadGame(game);
+                connectionManager.sendMessage(cmd.getAuthToken(), loadGameMessage);
+
+                Notification notification = new Notification(
+                        ServerMessage.ServerMessageType.NOTIFICATION,
+                        cmd.username + " connected to the game"
+                );
+                connectionManager.broadcast(cmd.getAuthToken(), notification, cmd.getGameID());
+            } catch (Exception e) {
+                System.err.println("Error in connect handler: " + e.getMessage());
+                e.printStackTrace();
+            }
+        } else {
+            throw new GameService.InvalidAuthTokenException("Invalid auth token");
+        }
+    }
 }
+
+
+
+
+
