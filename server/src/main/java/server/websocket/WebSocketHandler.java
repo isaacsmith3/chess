@@ -15,6 +15,8 @@ import websocket.messages.Notification;
 import websocket.messages.ServerMessage;
 import websocket.messages.Error;
 
+import java.io.IOException;
+
 @WebSocket
 public class WebSocketHandler {
 
@@ -46,7 +48,7 @@ public class WebSocketHandler {
     }
 
     @OnWebSocketMessage
-    public void onMessage(Session session, String message) throws GameService.InvalidAuthTokenException {
+    public void onMessage(Session session, String message) throws GameService.InvalidAuthTokenException, IOException {
         UserGameCommand cmd = new Gson().fromJson(message, UserGameCommand.class);
         System.out.println(cmd);
 
@@ -55,34 +57,37 @@ public class WebSocketHandler {
         }
     }
 
-    private void connect(ConnectCommand cmd, Session session) throws GameService.InvalidAuthTokenException {
-        if (gameService.verifyAuthToken(cmd.getAuthToken())) {
-            connectionManager.add(cmd.getAuthToken(), session, cmd.getGameID());
+    private void connect(ConnectCommand cmd, Session session) throws IOException, GameService.InvalidAuthTokenException {
+        if (!gameService.verifyAuthToken(cmd.getAuthToken())) {
+            Error errorMessage = new Error(ServerMessage.ServerMessageType.ERROR, "Error: invalid auth token");
+            connectionManager.sendMessage(session, errorMessage);
+            return;
+        }
 
-            try {
-                GameData game = gameService.getGame(new JoinGameRequest(cmd.getGameID(), null));
+        connectionManager.add(cmd.getAuthToken(), session, cmd.getGameID());
 
-                if (game == null) {
-                    Error errorMessage = new Error(ServerMessage.ServerMessageType.ERROR, "Error: game not found");
-                    connectionManager.sendMessage(cmd.getAuthToken(), errorMessage);
-                } else {
-                    LoadGame loadGameMessage = new LoadGame(game);
-                    connectionManager.sendMessage(cmd.getAuthToken(), loadGameMessage);
+        try {
+            GameData game = gameService.getGame(new JoinGameRequest(cmd.getGameID(), null));
 
-                    Notification notification = new Notification(
-                            ServerMessage.ServerMessageType.NOTIFICATION,
-                            cmd.username + " connected to the game"
-                    );
-                    connectionManager.broadcast(cmd.getAuthToken(), notification, cmd.getGameID());
-                }
-            } catch (Exception e) {
-                System.err.println("Error in connect handler: " + e.getMessage());
-                e.printStackTrace();
+            if (game == null) {
+                Error errorMessage = new Error(ServerMessage.ServerMessageType.ERROR, "Error: game not found");
+                connectionManager.sendMessage(cmd.getAuthToken(), errorMessage);
+            } else {
+                LoadGame loadGameMessage = new LoadGame(game);
+                connectionManager.sendMessage(cmd.getAuthToken(), loadGameMessage);
+
+                Notification notification = new Notification(
+                        ServerMessage.ServerMessageType.NOTIFICATION,
+                        cmd.username + " connected to the game"
+                );
+                connectionManager.broadcast(cmd.getAuthToken(), notification, cmd.getGameID());
             }
-        } else {
-            throw new GameService.InvalidAuthTokenException("Invalid auth token");
+        } catch (Exception e) {
+            System.err.println("Error in connect handler: " + e.getMessage());
+            e.printStackTrace();
         }
     }
+
 
 }
 

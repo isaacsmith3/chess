@@ -1,7 +1,7 @@
 package server.websocket;
 
 import org.eclipse.jetty.websocket.api.Session;
-import server.Server;
+import com.google.gson.Gson;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
@@ -47,6 +47,10 @@ public class ConnectionManager {
 
     public void removeSession(Session session) {
         connections.entrySet().removeIf(entry -> entry.getValue().session.equals(session));
+    }
+
+    public void sendMessage(Session session, ServerMessage message) throws IOException {
+        session.getRemote().sendString(new Gson().toJson(message));
     }
 
 

@@ -41,7 +41,7 @@ public class GameService {
             AuthData verifiedAuth = authTokenDAO.verifyAuth(authToken);
 
             if (verifiedAuth == null) {
-                throw new InvalidAuthTokenException("Invalid auth token");
+                return false;
             }
             return true;
         } catch (DataAccessException e) {
