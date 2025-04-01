@@ -1,5 +1,7 @@
 package server.websocket;
 
+import chess.ChessGame;
+import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import dataaccess.AuthTokenDAO;
 import dataaccess.GameDAO;
@@ -8,7 +10,9 @@ import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.*;
 import service.GameService;
 import types.JoinGameRequest;
+import types.UpdateGameRequest;
 import websocket.commands.ConnectCommand;
+import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.LoadGame;
 import websocket.messages.Notification;
@@ -54,6 +58,59 @@ public class WebSocketHandler {
 
         switch (cmd.getCommandType()) {
             case CONNECT -> connect(new Gson().fromJson(message, ConnectCommand.class), session);
+            case MAKE_MOVE -> makeMove(new Gson().fromJson(message, MakeMoveCommand.class), session);
+        }
+    }
+
+    private void makeMove(MakeMoveCommand cmd, Session session) throws GameService.InvalidAuthTokenException, IOException {
+        if (!gameService.verifyAuthToken(cmd.getAuthToken())) {
+            Error errorMessage = new Error(ServerMessage.ServerMessageType.ERROR, "Error: invalid auth token");
+            connectionManager.sendMessage(session, errorMessage);
+            return;
+        }
+
+
+        try {
+            GameData gameData = gameService.getGame(new JoinGameRequest(cmd.getGameID(), null));
+
+            if (gameData == null) {
+                Error errorMessage = new Error(ServerMessage.ServerMessageType.ERROR, "Error: game not found");
+                connectionManager.sendMessage(cmd.getAuthToken(), errorMessage);
+                return;
+            }
+
+            ChessGame chessGame = gameData.game();
+            chessGame.makeMove(cmd.getMove());
+
+            gameService.updateGame(cmd.getAuthToken(), new UpdateGameRequest(cmd.getGameID(), null, chessGame));
+
+            GameData updatedGame = gameService.getGame(new JoinGameRequest(cmd.getGameID(), null));
+
+            LoadGame loadGameMessage = new LoadGame(updatedGame);
+            for (Connection connection : connectionManager.connections.values()) {
+                if (connection.gameId == cmd.getGameID()) {
+                    connectionManager.sendMessage(connection.authToken, loadGameMessage);
+                }
+            }
+
+            Notification notification = new Notification(
+                    ServerMessage.ServerMessageType.NOTIFICATION,
+                    "A move was made from " + cmd.move.getStartPosition() + " to " + cmd.move.getEndPosition()
+            );
+            connectionManager.broadcast(cmd.getAuthToken(), notification, cmd.getGameID());
+
+
+        } catch (GameService.InvalidAuthTokenException e){
+            Error errorMessage = new Error(ServerMessage.ServerMessageType.ERROR, "Error: invalid game or move");
+            connectionManager.sendMessage(session, errorMessage);
+        } catch (InvalidMoveException e) {
+            throw new RuntimeException(e);
+        } catch (GameService.InvalidGameException e) {
+            throw new RuntimeException(e);
+        } catch (GameService.InvalidCredentialsException e) {
+            throw new RuntimeException(e);
+        } catch (GameService.InvalidGameRequestException e) {
+            throw new RuntimeException(e);
         }
     }
 
