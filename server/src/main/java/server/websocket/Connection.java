@@ -7,9 +7,10 @@ import websocket.messages.ServerMessage;
 import java.io.IOException;
 
 public class Connection {
-    public String authToken;
-    public Session session;
-    public int gameId;
+    public final String authToken;
+    public final Session session;
+    public final int gameId;
+    private static final Gson gson = new Gson();
 
     public Connection(String authToken, Session session, int gameId) {
         this.authToken = authToken;
@@ -17,9 +18,10 @@ public class Connection {
         this.gameId = gameId;
     }
 
-    public void send(ServerMessage msg) throws IOException {
-        Gson gson = new Gson();
-        String json = gson.toJson(msg);
-        session.getRemote().sendString(json);
+    public void send(ServerMessage message) throws IOException {
+        if (session.isOpen()) {
+            String jsonMessage = gson.toJson(message);
+            session.getRemote().sendString(jsonMessage);
+        }
     }
 }

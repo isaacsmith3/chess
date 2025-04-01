@@ -13,6 +13,7 @@ import websocket.commands.UserGameCommand;
 import websocket.messages.LoadGame;
 import websocket.messages.Notification;
 import websocket.messages.ServerMessage;
+import websocket.messages.Error;
 
 @WebSocket
 public class WebSocketHandler {
@@ -46,7 +47,6 @@ public class WebSocketHandler {
 
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws GameService.InvalidAuthTokenException {
-        System.out.println("in web socket handler");
         UserGameCommand cmd = new Gson().fromJson(message, UserGameCommand.class);
         System.out.println(cmd);
 
@@ -61,14 +61,20 @@ public class WebSocketHandler {
 
             try {
                 GameData game = gameService.getGame(new JoinGameRequest(cmd.getGameID(), null));
-                LoadGame loadGameMessage = new LoadGame(game);
-                connectionManager.sendMessage(cmd.getAuthToken(), loadGameMessage);
 
-                Notification notification = new Notification(
-                        ServerMessage.ServerMessageType.NOTIFICATION,
-                        cmd.username + " connected to the game"
-                );
-                connectionManager.broadcast(cmd.getAuthToken(), notification, cmd.getGameID());
+                if (game == null) {
+                    Error errorMessage = new Error(ServerMessage.ServerMessageType.ERROR, "Error: game not found");
+                    connectionManager.sendMessage(cmd.getAuthToken(), errorMessage);
+                } else {
+                    LoadGame loadGameMessage = new LoadGame(game);
+                    connectionManager.sendMessage(cmd.getAuthToken(), loadGameMessage);
+
+                    Notification notification = new Notification(
+                            ServerMessage.ServerMessageType.NOTIFICATION,
+                            cmd.username + " connected to the game"
+                    );
+                    connectionManager.broadcast(cmd.getAuthToken(), notification, cmd.getGameID());
+                }
             } catch (Exception e) {
                 System.err.println("Error in connect handler: " + e.getMessage());
                 e.printStackTrace();
@@ -77,6 +83,7 @@ public class WebSocketHandler {
             throw new GameService.InvalidAuthTokenException("Invalid auth token");
         }
     }
+
 }
 
 
