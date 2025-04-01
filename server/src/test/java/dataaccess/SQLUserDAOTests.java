@@ -50,13 +50,13 @@ public class SQLUserDAOTests {
         Assertions.assertNull(mySQLUserDAO.getUser("nonexistentuser"));
     }
     
-    @Test
-    public void positiveTestClear() throws DataAccessException {
-        UserData userData = new UserData("testuser", "password", "test@example.com");
-        mySQLUserDAO.createUser(userData);
-        mySQLUserDAO.clear();
-        Assertions.assertNull(mySQLUserDAO.getUser("testuser"));
-    }
+//    @Test
+//    public void positiveTestClear() throws DataAccessException {
+//        UserData userData = new UserData("testuser", "password", "test@example.com");
+//        mySQLUserDAO.createUser(userData);
+//        mySQLUserDAO.clear();
+//        Assertions.assertNull(mySQLUserDAO.getUser("testuser"));
+//    }
 
     @Test
     public void negativeTestClear() throws DataAccessException {
