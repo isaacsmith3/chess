@@ -89,6 +89,19 @@ public class WebSocketHandler {
             boolean isWhitePlayer = username.equals(gameData.whiteUsername());
             boolean isBlackPlayer = username.equals(gameData.blackUsername());
 
+            boolean isGameOver = chessGame.isInCheckmate(ChessGame.TeamColor.WHITE) ||
+                    chessGame.isInCheckmate(ChessGame.TeamColor.BLACK) ||
+                    chessGame.isInStalemate(ChessGame.TeamColor.WHITE) ||
+                    chessGame.isInStalemate(ChessGame.TeamColor.BLACK);
+
+
+
+            if (isGameOver) {
+                Error errorMessage = new Error(ServerMessage.ServerMessageType.ERROR, "Error: game is over");
+                connectionManager.sendMessage(cmd.getAuthToken(), errorMessage);
+                return;
+            }
+
             if ((isWhitePlayer && currentTurn != ChessGame.TeamColor.WHITE) ||
                     (isBlackPlayer && currentTurn != ChessGame.TeamColor.BLACK) ||
                     (!isWhitePlayer && !isBlackPlayer)) {

@@ -169,7 +169,7 @@ public class GameService {
                 throw new InvalidCredentialsException("Team color must be WHITE or BLACk");
             }
 
-            gameDAO.joinGame(updatedGame);
+            gameDAO.updateGame(updatedGame);
         } catch (DataAccessException e) {
             throw new InvalidAuthTokenException("Invalid auth token");
         }

@@ -14,4 +14,6 @@ public interface GameDAO {
     Collection<ListGamesResult> getGames();
     void clear();
     Collection<GameData> getAllGames();
+
+    void updateGame(GameData updatedGame);
 }

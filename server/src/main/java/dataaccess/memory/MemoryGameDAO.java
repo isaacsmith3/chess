@@ -67,5 +67,9 @@ public class MemoryGameDAO implements GameDAO {
         return gameDataCollection;
     }
 
+    @Override
+    public void updateGame(GameData updatedGame) {
+
+    }
 
 }
