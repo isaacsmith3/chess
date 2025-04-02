@@ -83,6 +83,32 @@ public class MySQLGameDAO implements GameDAO {
         } catch (SQLException | DataAccessException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void updateGame(GameData updatedGame) {
+        try (Connection conn = databaseManager.getConnection()) {
+            String sql = "UPDATE games SET whiteUserName = ?, blackUserName = ?, jsonChessGame = ? WHERE gameID = ?";
+
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                if (updatedGame.whiteUsername() == null) {
+                    ps.setNull(1, Types.VARCHAR);
+                } else {
+                    ps.setString(1, updatedGame.whiteUsername());
+                }
+                if (updatedGame.blackUsername() == null) {
+                    ps.setNull(2, Types.VARCHAR);
+                } else {
+                    ps.setString(2, updatedGame.blackUsername());
+                }
+                ps.setString(3, new Gson().toJson(updatedGame.game()));
+                ps.setInt(4, updatedGame.gameID());
+                ps.executeUpdate();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        } catch (SQLException | DataAccessException e) {
+            throw new RuntimeException(e);
+        }
 
     }
 
