@@ -14,6 +14,7 @@ import types.JoinGameRequest;
 import types.UpdateGameRequest;
 import websocket.commands.ConnectCommand;
 import websocket.commands.MakeMoveCommand;
+import websocket.commands.ResignCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.LoadGame;
 import websocket.messages.Notification;
@@ -60,7 +61,76 @@ public class WebSocketHandler {
         switch (cmd.getCommandType()) {
             case CONNECT -> connect(new Gson().fromJson(message, ConnectCommand.class), session);
             case MAKE_MOVE -> makeMove(new Gson().fromJson(message, MakeMoveCommand.class), session);
+            case RESIGN -> resign(new Gson().fromJson(message, ResignCommand.class), session);
         }
+    }
+
+    private void resign(ResignCommand cmd, Session session) throws GameService.InvalidAuthTokenException, IOException {
+        if (!gameService.verifyAuthToken(cmd.getAuthToken())) {
+            Error errorMessage = new Error(ServerMessage.ServerMessageType.ERROR, "Error: invalid auth token");
+            connectionManager.sendMessage(session, errorMessage);
+            return;
+        }
+
+        try {
+            GameData gameData = gameService.getGame(new JoinGameRequest(cmd.getGameID(), null));
+
+            if (gameData == null) {
+                Error errorMessage = new Error(ServerMessage.ServerMessageType.ERROR, "Error: game not found");
+                connectionManager.sendMessage(cmd.getAuthToken(), errorMessage);
+                return;
+            }
+
+            AuthData authData = gameService.getUserNameByAuthToken(cmd.getAuthToken());
+            String username = authData.userName();
+
+            ChessGame chessGame = gameData.game();
+
+            boolean isWhitePlayer = username.equals(gameData.whiteUsername());
+            boolean isBlackPlayer = username.equals(gameData.blackUsername());
+
+            if (!isWhitePlayer && !isBlackPlayer) {
+                Error errorMessage = new Error(ServerMessage.ServerMessageType.ERROR, "Error: only players can resign");
+                connectionManager.sendMessage(cmd.getAuthToken(), errorMessage);
+                return;
+            }
+
+            // check if game is already over
+            boolean isGameOver = chessGame.isInCheckmate(ChessGame.TeamColor.WHITE) ||
+                    chessGame.isInCheckmate(ChessGame.TeamColor.BLACK) ||
+                    chessGame.isInStalemate(ChessGame.TeamColor.WHITE) ||
+                    chessGame.isInStalemate(ChessGame.TeamColor.BLACK);
+
+            if (isGameOver) {
+                Error errorMessage = new Error(ServerMessage.ServerMessageType.ERROR, "Error: game is already over");
+                connectionManager.sendMessage(cmd.getAuthToken(), errorMessage);
+                return;
+            }
+
+            chessGame.setGameOver(true);
+
+            gameService.updateGame(cmd.getAuthToken(), new UpdateGameRequest(cmd.getGameID(), null, chessGame));
+
+            String message = username + " resigned the game";
+            Notification notification = new Notification(
+                    ServerMessage.ServerMessageType.NOTIFICATION,
+                    message
+            );
+
+            for (Connection connection : connectionManager.connections.values()) {
+                if (connection.gameId == cmd.getGameID()) {
+                    connectionManager.sendMessage(connection.authToken, notification);
+                }
+            }
+
+        } catch (GameService.InvalidGameException e) {
+            throw new RuntimeException(e);
+        } catch (GameService.InvalidCredentialsException e) {
+            throw new RuntimeException(e);
+        } catch (GameService.InvalidGameRequestException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     private void makeMove(MakeMoveCommand cmd, Session session) throws GameService.InvalidAuthTokenException, IOException {
@@ -69,7 +139,6 @@ public class WebSocketHandler {
             connectionManager.sendMessage(session, errorMessage);
             return;
         }
-
 
         try {
             GameData gameData = gameService.getGame(new JoinGameRequest(cmd.getGameID(), null));
@@ -93,8 +162,6 @@ public class WebSocketHandler {
                     chessGame.isInCheckmate(ChessGame.TeamColor.BLACK) ||
                     chessGame.isInStalemate(ChessGame.TeamColor.WHITE) ||
                     chessGame.isInStalemate(ChessGame.TeamColor.BLACK);
-
-
 
             if (isGameOver) {
                 Error errorMessage = new Error(ServerMessage.ServerMessageType.ERROR, "Error: game is over");
@@ -129,7 +196,6 @@ public class WebSocketHandler {
                     "A move was made from " + cmd.move.getStartPosition() + " to " + cmd.move.getEndPosition()
             );
             connectionManager.broadcast(cmd.getAuthToken(), notification, cmd.getGameID());
-
 
         } catch (GameService.InvalidAuthTokenException e){
             Error errorMessage = new Error(ServerMessage.ServerMessageType.ERROR, "Error: invalid auth token");

@@ -227,4 +227,8 @@ public class ChessGame {
     public ChessBoard getBoard() {
         return board;
     }
+
+    public void setGameOver(boolean gameOver) {
+        this.gameOver = gameOver;
+    }
 }
