@@ -104,9 +104,11 @@ public class WebSocketHandler {
             Error errorMessage = new Error(ServerMessage.ServerMessageType.ERROR, "Error: invalid game or move");
             connectionManager.sendMessage(session, errorMessage);
         } catch (InvalidMoveException e) {
-            throw new RuntimeException(e);
+            Error errorMessage = new Error(ServerMessage.ServerMessageType.ERROR, "Error: invalid move");
+            connectionManager.sendMessage(cmd.getAuthToken(), errorMessage);
         } catch (GameService.InvalidGameException e) {
-            throw new RuntimeException(e);
+            Error errorMessage = new Error(ServerMessage.ServerMessageType.ERROR, "Error: invalid game");
+            connectionManager.sendMessage(cmd.getAuthToken(), errorMessage);
         } catch (GameService.InvalidCredentialsException e) {
             throw new RuntimeException(e);
         } catch (GameService.InvalidGameRequestException e) {
