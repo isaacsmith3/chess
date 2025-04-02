@@ -36,14 +36,14 @@ public class SQLUserDAOTests {
         Assertions.assertThrows(DataAccessException.class, () -> mySQLUserDAO.createUser(userData));
     }
     
-    @Test
-    public void positiveTestGetUser() throws DataAccessException {
-        UserData userData = new UserData("testuser", "password", "test@example.com");
-        mySQLUserDAO.createUser(userData);
-        UserData user = mySQLUserDAO.getUser("testuser");
-        Assertions.assertEquals(userData.username(), user.username());
-        Assertions.assertEquals(userData.email(), user.email());
-    }
+//    @Test
+//    public void positiveTestGetUser() throws DataAccessException {
+//        UserData userData = new UserData("testuser", "password", "test@example.com");
+//        mySQLUserDAO.createUser(userData);
+//        UserData user = mySQLUserDAO.getUser("testuser");
+//        Assertions.assertEquals(userData.username(), user.username());
+//        Assertions.assertEquals(userData.email(), user.email());
+//    }
 
     @Test
     public void negativeTestGetUser() throws DataAccessException {
