@@ -175,6 +175,23 @@ public class GameService {
         }
     }
 
+    public AuthData getUserNameByAuthToken(String authToken) throws InvalidAuthTokenException {
+        Object authDataCollection = authTokenDAO.getAuthTokens();
+        if (authDataCollection == null) {
+            throw new InvalidAuthTokenException("No auth token found");
+        }
+        AuthData authData = null;
+        for (var a : (Collection<AuthData>) authDataCollection) {
+            if (Objects.equals(a.authToken(), authToken)) {
+                authData = new AuthData(a.authToken(), a.userName());
+            }
+        }
+        if (authData == null) {
+            throw new InvalidAuthTokenException("Invalid auth token");
+        }
+        return authData;
+    }
+
     public static class InvalidAuthTokenException extends Exception {
         public InvalidAuthTokenException(String message) {
             super(message);

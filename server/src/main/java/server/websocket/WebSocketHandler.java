@@ -5,6 +5,7 @@ import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import dataaccess.AuthTokenDAO;
 import dataaccess.GameDAO;
+import model.AuthData;
 import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.*;
@@ -79,7 +80,24 @@ public class WebSocketHandler {
                 return;
             }
 
+            AuthData authData = gameService.getUserNameByAuthToken(cmd.getAuthToken());
+            String username = authData.userName();
+
             ChessGame chessGame = gameData.game();
+            ChessGame.TeamColor currentTurn = chessGame.getTeamTurn();
+
+            boolean isWhitePlayer = username.equals(gameData.whiteUsername());
+            boolean isBlackPlayer = username.equals(gameData.blackUsername());
+
+            if ((isWhitePlayer && currentTurn != ChessGame.TeamColor.WHITE) ||
+                    (isBlackPlayer && currentTurn != ChessGame.TeamColor.BLACK) ||
+                    (!isWhitePlayer && !isBlackPlayer)) {
+
+                Error errorMessage = new Error(ServerMessage.ServerMessageType.ERROR, "Error: not your turn");
+                connectionManager.sendMessage(cmd.getAuthToken(), errorMessage);
+                return;
+            }
+
             chessGame.makeMove(cmd.getMove());
 
             gameService.updateGame(cmd.getAuthToken(), new UpdateGameRequest(cmd.getGameID(), null, chessGame));
@@ -101,7 +119,7 @@ public class WebSocketHandler {
 
 
         } catch (GameService.InvalidAuthTokenException e){
-            Error errorMessage = new Error(ServerMessage.ServerMessageType.ERROR, "Error: invalid game or move");
+            Error errorMessage = new Error(ServerMessage.ServerMessageType.ERROR, "Error: invalid auth token");
             connectionManager.sendMessage(session, errorMessage);
         } catch (InvalidMoveException e) {
             Error errorMessage = new Error(ServerMessage.ServerMessageType.ERROR, "Error: invalid move");

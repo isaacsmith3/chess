@@ -11,7 +11,7 @@ import java.util.Collection;
  */
 public class ChessGame {
 
-    private TeamColor currentTurn;
+    public TeamColor currentTurn;
     private ChessBoard board;
     private boolean gameOver;
 
