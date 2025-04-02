@@ -86,6 +86,12 @@ public class WebSocketHandler {
 
             ChessGame chessGame = gameData.game();
 
+            if (chessGame.isGameOver()) {
+                Error errorMessage = new Error(ServerMessage.ServerMessageType.ERROR, "Error: game is already over");
+                connectionManager.sendMessage(cmd.getAuthToken(), errorMessage);
+                return;
+            }
+
             boolean isWhitePlayer = username.equals(gameData.whiteUsername());
             boolean isBlackPlayer = username.equals(gameData.blackUsername());
 
@@ -154,6 +160,12 @@ public class WebSocketHandler {
 
             ChessGame chessGame = gameData.game();
             ChessGame.TeamColor currentTurn = chessGame.getTeamTurn();
+
+            if (chessGame.isGameOver()) {
+                Error errorMessage = new Error(ServerMessage.ServerMessageType.ERROR, "Error: game is already over");
+                connectionManager.sendMessage(cmd.getAuthToken(), errorMessage);
+                return;
+            }
 
             boolean isWhitePlayer = username.equals(gameData.whiteUsername());
             boolean isBlackPlayer = username.equals(gameData.blackUsername());

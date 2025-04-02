@@ -231,4 +231,8 @@ public class ChessGame {
     public void setGameOver(boolean gameOver) {
         this.gameOver = gameOver;
     }
+
+    public boolean isGameOver() {
+        return gameOver;
+    }
 }
