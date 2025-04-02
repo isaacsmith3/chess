@@ -175,6 +175,48 @@ public class GameService {
         }
     }
 
+    public void leaveGame(String authToken, UpdateGameRequest gameRequest)
+            throws InvalidAuthTokenException, InvalidGameException, InvalidCredentialsException, InvalidGameRequestException {
+        try {
+            AuthData verifiedAuth = authTokenDAO.verifyAuth(authToken);
+            String playerColor = gameRequest.playerColor();
+
+            if (verifiedAuth == null) {
+                throw new InvalidAuthTokenException("Invalid auth token");
+            }
+
+            JoinGameRequest joinGameRequest = new JoinGameRequest(gameRequest.gameID(), gameRequest.playerColor());
+
+            GameData game = gameDAO.getGame(joinGameRequest);
+
+            if (gameRequest.game() != null) { // For the case where we are updating the game too
+                game = new GameData(game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName(), gameRequest.game());
+            }
+
+            if (game == null) {
+                throw new InvalidGameRequestException("Game does not exist");
+            }
+
+            GameData updatedGame;
+
+            if (Objects.equals(playerColor, "WHITE")) {
+                    updatedGame = new GameData(game.gameID(), null, game.blackUsername(), game.gameName(), game.game());
+            } else if (Objects.equals(playerColor, "BLACK")) {
+                    updatedGame = new GameData(game.gameID(), game.whiteUsername(), null, game.gameName(), game.game());
+            } else if (playerColor == null) {
+                // This might cause issues with previous code. Here I'm just updating the game through the websocket
+                updatedGame = game;
+            }
+            else {
+                throw new InvalidCredentialsException("Team color must be WHITE or BLACk");
+            }
+
+            gameDAO.updateGame(updatedGame);
+        } catch (DataAccessException e) {
+            throw new InvalidAuthTokenException("Invalid auth token");
+        }
+    }
+
     public AuthData getUserNameByAuthToken(String authToken) throws InvalidAuthTokenException {
         Object authDataCollection = authTokenDAO.getAuthTokens();
         if (authDataCollection == null) {

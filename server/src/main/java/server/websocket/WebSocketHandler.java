@@ -12,10 +12,7 @@ import org.eclipse.jetty.websocket.api.annotations.*;
 import service.GameService;
 import types.JoinGameRequest;
 import types.UpdateGameRequest;
-import websocket.commands.ConnectCommand;
-import websocket.commands.MakeMoveCommand;
-import websocket.commands.ResignCommand;
-import websocket.commands.UserGameCommand;
+import websocket.commands.*;
 import websocket.messages.LoadGame;
 import websocket.messages.Notification;
 import websocket.messages.ServerMessage;
@@ -62,7 +59,63 @@ public class WebSocketHandler {
             case CONNECT -> connect(new Gson().fromJson(message, ConnectCommand.class), session);
             case MAKE_MOVE -> makeMove(new Gson().fromJson(message, MakeMoveCommand.class), session);
             case RESIGN -> resign(new Gson().fromJson(message, ResignCommand.class), session);
+            case LEAVE -> leave(new Gson().fromJson(message, LeaveCommand.class), session);
         }
+    }
+
+    private void leave(LeaveCommand cmd, Session session) throws GameService.InvalidAuthTokenException, IOException {
+        if (!gameService.verifyAuthToken(cmd.getAuthToken())) {
+            Error errorMessage = new Error(ServerMessage.ServerMessageType.ERROR, "Error: invalid auth token");
+            connectionManager.sendMessage(session, errorMessage);
+            return;
+        }
+
+        try {
+            GameData gameData = gameService.getGame(new JoinGameRequest(cmd.getGameID(), null));
+
+            if (gameData == null) {
+                Error errorMessage = new Error(ServerMessage.ServerMessageType.ERROR, "Error: game not found");
+                connectionManager.sendMessage(cmd.getAuthToken(), errorMessage);
+            } else {
+                AuthData authData = gameService.getUserNameByAuthToken(cmd.getAuthToken());
+                String username = authData.userName();
+
+                ChessGame chessGame = gameData.game();
+
+                if (chessGame.isGameOver()) {
+                    Error errorMessage = new Error(ServerMessage.ServerMessageType.ERROR, "Error: game is already over");
+                    connectionManager.sendMessage(cmd.getAuthToken(), errorMessage);
+                    return;
+                }
+
+                boolean isWhitePlayer = username.equals(gameData.whiteUsername());
+                boolean isBlackPlayer = username.equals(gameData.blackUsername());
+
+                if (isWhitePlayer || isBlackPlayer) {
+                    String playerColor = isWhitePlayer ? "WHITE" : "BLACK";
+                    gameService.leaveGame(cmd.getAuthToken(), new UpdateGameRequest(cmd.getGameID(), playerColor, gameData.game()));
+                }
+
+                String message = username + " left the game";
+                Notification notification = new Notification(
+                        ServerMessage.ServerMessageType.NOTIFICATION,
+                        message
+                );
+
+                for (Connection connection : connectionManager.connections.values()) {
+                    if (connection.gameId == cmd.getGameID() && !connection.authToken.equals(cmd.getAuthToken())) {
+                        connectionManager.sendMessage(connection.authToken, notification);
+                    }
+                }
+
+                connectionManager.connections.remove(cmd.getAuthToken());
+
+            }
+        } catch (Exception e) {
+            System.err.println("Error in connect handler: " + e.getMessage());
+            e.printStackTrace();
+        }
+
     }
 
     private void resign(ResignCommand cmd, Session session) throws GameService.InvalidAuthTokenException, IOException {
