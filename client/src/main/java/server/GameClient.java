@@ -15,7 +15,7 @@ import websocket.WebSocketFacade;
 
 import java.io.IOException;
 import java.rmi.ServerException;
-import java.util.Collection;
+import java.util.Scanner;
 
 public class GameClient {
     private final ServerFacade serverFacade;
@@ -59,6 +59,10 @@ public class GameClient {
             case "leave":
                 webSocketFacade.leave(authData.authToken(), gameId);
                 return "Left game successfully";
+            case "highlight":
+                return highlight();
+
+
         }
         return "Invalid command";
     }
@@ -74,6 +78,43 @@ public class GameClient {
         output.append("leave - leave the game\n");
         output.append("quit - quit the program\n");
         return output.toString();
+    }
+
+    private String highlight() {
+        if (!gameHandler.isGameRunning()) {
+            return "Game not running";
+        }
+
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Enter position (e.g., e2):");
+        String input = scanner.nextLine().toLowerCase().trim();
+
+        if (input.length() != 2 ||
+                !Character.isLetter(input.charAt(0)) ||
+                !Character.isDigit(input.charAt(1))) {
+            return "Invalid position format. Use format like 'e2'";
+        }
+
+        char fileLetter = input.charAt(0);
+        int rank = Character.getNumericValue(input.charAt(1));
+
+        int col = fileLetter - 'a' + 1;
+        int row = rank;
+
+        ChessPosition position = new ChessPosition(row, col);
+        ChessPiece piece = chessGame.getBoard().getPiece(position);
+
+        if (piece == null) {
+            return "No piece at position " + input;
+        }
+
+        boolean isBlack = playerColor != null && playerColor.equalsIgnoreCase("BLACK");
+        gameHandler.highlight(piece, position, isBlack);
+
+        return "Highlighted valid moves for piece at " + input;
+
+
     }
 
 }

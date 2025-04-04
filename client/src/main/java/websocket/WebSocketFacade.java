@@ -18,6 +18,11 @@ import java.rmi.ServerException;
 
 public class WebSocketFacade extends Endpoint {
 
+    // Databricks and graduation plans
+    // How you got started in team forming
+    // How did the August come up with its idea
+    // What is the mindset I should adopt going into sandbox if I don't have a project I'm super passionate about
+
     Session session;
     String playerColor = null;
     GameHandler gameHandler;

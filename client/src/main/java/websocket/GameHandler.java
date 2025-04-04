@@ -1,17 +1,22 @@
 package websocket;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
 import model.GameData;
 import ui.EscapeSequences;
 import websocket.messages.Notification;
+
+import javax.print.DocFlavor;
+import java.util.Collection;
 
 public class GameHandler {
 
     public ChessGame chessGame;
     private String playerColor;
+    private boolean gameRunning;
+
+    public GameHandler() {
+        this.gameRunning = true;
+    }
 
     public void loadGame(GameData game) {
         this.chessGame = game.game();
@@ -117,4 +122,108 @@ public class GameHandler {
             default: return " ";
         }
     }
+
+    public boolean isGameRunning() {
+        return gameRunning;
+    }
+
+    public void highlight(ChessPiece piece, ChessPosition position, Boolean isBlack) {
+        if (chessGame == null || piece == null) {
+            System.out.println("Error: no piece or chess game");
+            return;
+        }
+
+        Collection<ChessMove> validMoves = chessGame.validMoves(position);
+
+        if (validMoves.isEmpty()) {
+            System.out.println("No valid moves for this piece. Choose a different piece");
+            return;
+        }
+
+        StringBuilder boardOutput = new StringBuilder();
+        boardOutput.append(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+        boardOutput.append(EscapeSequences.SET_TEXT_COLOR_BLACK);
+        boardOutput.append("\n");
+
+        printLetters(isBlack, boardOutput);
+        boardOutput.append("\n");
+
+        ChessBoard board = chessGame.getBoard();
+
+        for (int row = 0; row < 8; row++) {
+            int displayRow = isBlack ? row + 1 : 8 - row;
+            boardOutput.append(EscapeSequences.SET_TEXT_COLOR_BLACK);
+            boardOutput.append(displayRow).append(" ");
+
+            for (int col = 0; col < 8; col++) {
+                int displayCol = isBlack ? 8 - col : col + 1;
+                ChessPosition currentPosition = new ChessPosition(displayRow, displayCol);
+
+                boolean isValidMove = false;
+                for (ChessMove move : validMoves) {
+                    ChessPosition endPos = move.getEndPosition();
+                    if (endPos.getRow() == currentPosition.getRow() &&
+                            endPos.getColumn() == currentPosition.getColumn()) {
+                        isValidMove = true;
+                        break;
+                    }
+                }
+
+                boolean isSelectedPiece = (currentPosition.getRow() == position.getRow() &&
+                        currentPosition.getColumn() == position.getColumn());
+
+                boolean isLightSquare = (row + col) % 2 == 0;
+                String backgroundColor;
+
+                if (isValidMove) {
+                    backgroundColor = EscapeSequences.SET_BG_COLOR_GREEN;
+                } else if (isSelectedPiece) {
+                    backgroundColor = EscapeSequences.SET_BG_COLOR_YELLOW;
+                } else {
+                    backgroundColor = isLightSquare ?
+                            EscapeSequences.SET_BG_COLOR_WHITE : EscapeSequences.SET_BG_COLOR_BLACK;
+                }
+
+                boardOutput.append(backgroundColor);
+
+                ChessPiece currentPiece = board.getPiece(currentPosition);
+                if (currentPiece != null) {
+                    String textColor = currentPiece.getTeamColor() == ChessGame.TeamColor.WHITE ? EscapeSequences.SET_TEXT_COLOR_BLUE : EscapeSequences.SET_TEXT_COLOR_RED;
+                    String pieceChar = getPieceChar(currentPiece.getPieceType());
+                    boardOutput.append(" ").append(textColor).append(pieceChar).append(" ");
+                } else {
+                    boardOutput.append("   ");
+                }
+            }
+            boardOutput.append(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+            boardOutput.append(EscapeSequences.SET_TEXT_COLOR_BLACK);
+            boardOutput.append(" ").append(displayRow).append("\n");
+        }
+
+        boardOutput.append(EscapeSequences.SET_TEXT_COLOR_BLACK);
+        printLetters(isBlack, boardOutput);
+        boardOutput.append(EscapeSequences.RESET_BG_COLOR);
+        boardOutput.append(EscapeSequences.RESET_TEXT_COLOR);
+        boardOutput.append("\n");
+
+        System.out.println(boardOutput);
+
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
