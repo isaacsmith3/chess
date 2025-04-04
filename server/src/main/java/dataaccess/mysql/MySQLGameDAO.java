@@ -87,7 +87,8 @@ public class MySQLGameDAO implements GameDAO {
 
     public void updateGame(GameData updatedGame) {
         try (Connection conn = databaseManager.getConnection()) {
-            String sql = "UPDATE games SET whiteUserName = ?, blackUserName = ?, jsonChessGame = ? WHERE gameID = ?";
+            // Add gameName to your update SQL
+            String sql = "UPDATE games SET whiteUserName = ?, blackUserName = ?, gameName = ?, jsonChessGame = ? WHERE gameID = ?";
 
             try (PreparedStatement ps = conn.prepareStatement(sql)) {
                 if (updatedGame.whiteUsername() == null) {
@@ -100,8 +101,9 @@ public class MySQLGameDAO implements GameDAO {
                 } else {
                     ps.setString(2, updatedGame.blackUsername());
                 }
-                ps.setString(3, new Gson().toJson(updatedGame.game()));
-                ps.setInt(4, updatedGame.gameID());
+                ps.setString(3, updatedGame.gameName());
+                ps.setString(4, new Gson().toJson(updatedGame.game()));
+                ps.setInt(5, updatedGame.gameID());
                 ps.executeUpdate();
             } catch (SQLException e) {
                 throw new RuntimeException(e);
@@ -109,18 +111,23 @@ public class MySQLGameDAO implements GameDAO {
         } catch (SQLException | DataAccessException e) {
             throw new RuntimeException(e);
         }
-
     }
+
 
     @Override
     public Collection<ListGamesResult> getGames() {
         Collection<ListGamesResult> games = new ArrayList<>();
         try (Connection conn = databaseManager.getConnection()) {
-            String sql = "SELECT gameID, gameName, jsonChessGame FROM games";
+            String sql = "SELECT gameID, whiteUsername, blackUsername, gameName FROM games";
             try (PreparedStatement ps = conn.prepareStatement(sql)) {
                 try (ResultSet rs = ps.executeQuery()) {
                     while (rs.next()) {
-                        ListGamesResult game = new Gson().fromJson(rs.getString("jsonChessGame"), ListGamesResult.class);
+                        ListGamesResult game = new ListGamesResult(
+                                rs.getInt("gameID"),
+                                rs.getString("whiteUsername"),
+                                rs.getString("blackUsername"),
+                                rs.getString("gameName")
+                        );
                         games.add(game);
                     }
                 }
@@ -128,9 +135,9 @@ public class MySQLGameDAO implements GameDAO {
         } catch (SQLException | DataAccessException e) {
             throw new RuntimeException(e);
         }
-
         return games;
     }
+
 
     @Override
     public void clear() {
