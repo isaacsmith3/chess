@@ -1,10 +1,12 @@
 package websocket;
 
+import chess.ChessMove;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import websocket.commands.ConnectCommand;
 import websocket.commands.LeaveCommand;
+import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.LoadGame;
 import websocket.messages.Notification;
@@ -17,11 +19,6 @@ import java.net.URISyntaxException;
 import java.rmi.ServerException;
 
 public class WebSocketFacade extends Endpoint {
-
-    // Databricks and graduation plans
-    // How you got started in team forming
-    // How did the August come up with its idea
-    // What is the mindset I should adopt going into sandbox if I don't have a project I'm super passionate about
 
     Session session;
     String playerColor = null;
@@ -82,6 +79,7 @@ public class WebSocketFacade extends Endpoint {
             String typeStr = jsonMsg.get("serverMessageType").getAsString();
 
             if (typeStr.equals("LOAD_GAME")) {
+                LoadGame loadGameMsg = new Gson().fromJson(rawMessage, LoadGame.class);
                 gameHandler.loadGame(new Gson().fromJson(rawMessage, LoadGame.class).getGame());
             }
             else if (typeStr.equals("NOTIFICATION")) {
@@ -125,5 +123,16 @@ public class WebSocketFacade extends Endpoint {
         String commandJson = gson.toJson(command);
         this.session.getBasicRemote().sendText(commandJson);
     }
+
+    public void makeMove(String authToken, int gameId, ChessMove move) throws IOException {
+        MakeMoveCommand command = new MakeMoveCommand(
+                UserGameCommand.CommandType.MAKE_MOVE,
+                authToken,
+                gameId,
+                move
+        );
+        sendCommand(command);
+    }
+
 
 }

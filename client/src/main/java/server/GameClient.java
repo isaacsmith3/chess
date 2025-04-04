@@ -1,27 +1,18 @@
 package server;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
-import exception.ResponseException;
+import chess.*;
 import model.AuthData;
-import org.eclipse.jetty.websocket.client.WebSocketClient;
-import org.eclipse.jetty.websocket.common.WebSocketFrame;
-import types.ListGamesResult;
-import ui.EscapeSequences;
 import websocket.GameHandler;
 import websocket.WebSocketFacade;
 
 import java.io.IOException;
 import java.rmi.ServerException;
+import java.util.Collection;
 import java.util.Scanner;
 
 public class GameClient {
-    private final ServerFacade serverFacade;
     private String playerColor = null;
     private final int gameId;
-    private ChessGame chessGame;
     private boolean isObserving;
     private String serverUrl;
     private GameHandler gameHandler;
@@ -30,9 +21,7 @@ public class GameClient {
 
     public GameClient(String serverUrl, String playerColor, int gameId, boolean isObserving, AuthData authData) throws ServerException {
         this.serverUrl = serverUrl;
-        this.serverFacade = new ServerFacade(serverUrl);
         this.gameId = gameId;
-        this.chessGame = new ChessGame();
         this.isObserving = isObserving;
         this.gameHandler = new GameHandler();
         this.gameHandler.setPlayerColor(playerColor);
@@ -55,12 +44,15 @@ public class GameClient {
             case "help":
                 return help();
             case "draw":
-                return gameHandler.drawBoard(this.playerColor, this.chessGame.getBoard());
+                return gameHandler.drawBoard(this.playerColor, this.gameHandler.chessGame.getBoard());
             case "leave":
                 webSocketFacade.leave(authData.authToken(), gameId);
                 return "Left game successfully";
             case "highlight":
                 return highlight();
+            case "move":
+                return makeMove();
+
 
 
         }
@@ -80,6 +72,122 @@ public class GameClient {
         return output.toString();
     }
 
+    private String makeMove() {
+        if (!gameHandler.isGameRunning()) {
+            return "Game not running";
+        }
+
+        String gameTurn = gameHandler.chessGame.getTeamTurn().toString().toLowerCase();
+        if(!gameTurn.equals(playerColor)){
+            return "Please wait your turn";
+        }
+
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Enter piece position (e.g., e2):");
+
+        String startInput = scanner.nextLine().toLowerCase().trim();
+
+        if (startInput.length() != 2 ||
+                !Character.isLetter(startInput.charAt(0)) ||
+                !Character.isDigit(startInput.charAt(1))) {
+            return "Invalid position format. Use format like 'e2'";
+        }
+
+        char startColumn = startInput.charAt(0);
+        int startRank = Character.getNumericValue(startInput.charAt(1));
+
+        int startCol = startColumn - 'a' + 1;
+        int startRow = startRank;
+
+        ChessPosition startPosition = new ChessPosition(startRow, startCol);
+        ChessPiece piece = gameHandler.chessGame.getBoard().getPiece(startPosition);
+
+        if (piece == null) {
+            return "No piece at position " + startInput;
+        }
+
+        if (piece.getTeamColor() != gameHandler.chessGame.getTeamTurn()) {
+            return "That's not your piece to move";
+        }
+
+        Collection<ChessMove> validMoves = gameHandler.chessGame.validMoves(startPosition);
+        if (validMoves.isEmpty()) {
+            return "No valid moves for this piece";
+        }
+
+        System.out.println("Valid moves for " + startInput + ":");
+        int i = 1;
+        for (ChessMove move : validMoves) {
+            ChessPosition endPos = move.getEndPosition();
+            char endFile = (char)('a' + endPos.getColumn() - 1);
+            int endRank = endPos.getRow();
+            System.out.print(i + ". " + endFile + endRank);
+
+            if (move.getPromotionPiece() != null) {
+                System.out.println(" (promotes to " + move.getPromotionPiece() + ")");
+            } else {
+                System.out.println();
+            }
+            i++;
+        }
+
+        System.out.println("Enter destination position (e.g., e4):");
+        String endInput = scanner.nextLine().toLowerCase().trim();
+
+        if (endInput.length() != 2 ||
+                !Character.isLetter(endInput.charAt(0)) ||
+                !Character.isDigit(endInput.charAt(1))) {
+            return "Invalid position format. Use format like 'e4'";
+        }
+
+        char endFile = endInput.charAt(0);
+        int endRank = Character.getNumericValue(endInput.charAt(1));
+
+        int endCol = endFile - 'a' + 1;
+        int endRow = endRank;
+
+        ChessPosition endPosition = new ChessPosition(endRow, endCol);
+
+        ChessMove selectedMove = null;
+        for (ChessMove move : validMoves) {
+            if (move.getEndPosition().getRow() == endPosition.getRow() &&
+                    move.getEndPosition().getColumn() == endPosition.getColumn()) {
+                selectedMove = move;
+                break;
+            }
+        }
+
+        if (selectedMove == null) {
+            return "Invalid move. That is not a legal destination for this piece.";
+        }
+
+        // Deal with promotions
+        ChessPiece.PieceType promotionPiece = null;
+        if (piece.getPieceType() == ChessPiece.PieceType.PAWN &&
+                (endRow == 8 || endRow == 1)) {
+            System.out.println("Choose promotion piece (q=Queen, r=Rook, b=Bishop, n=Knight):");
+            String promotion = scanner.nextLine().toLowerCase().trim();
+
+            switch (promotion) {
+                case "q": promotionPiece = ChessPiece.PieceType.QUEEN; break;
+                case "r": promotionPiece = ChessPiece.PieceType.ROOK; break;
+                case "b": promotionPiece = ChessPiece.PieceType.BISHOP; break;
+                case "n": promotionPiece = ChessPiece.PieceType.KNIGHT; break;
+                default: return "Invalid promotion piece. Move canceled.";
+            }
+        }
+
+        ChessMove moveToMake = new ChessMove(startPosition, endPosition, promotionPiece);
+
+        try {
+            webSocketFacade.makeMove(authData.authToken(), gameId, moveToMake);
+            return "Move sent: " + startInput + " to " + endInput;
+        } catch (IOException e) {
+            return "Error sending move: " + e.getMessage();
+        }
+    }
+
     private String highlight() {
         if (!gameHandler.isGameRunning()) {
             return "Game not running";
@@ -87,7 +195,7 @@ public class GameClient {
 
         Scanner scanner = new Scanner(System.in);
 
-        System.out.println("Enter position (e.g., e2):");
+        System.out.println("Enter piece position (e.g., e2):");
         String input = scanner.nextLine().toLowerCase().trim();
 
         if (input.length() != 2 ||
@@ -103,7 +211,7 @@ public class GameClient {
         int row = rank;
 
         ChessPosition position = new ChessPosition(row, col);
-        ChessPiece piece = chessGame.getBoard().getPiece(position);
+        ChessPiece piece = gameHandler.chessGame.getBoard().getPiece(position);
 
         if (piece == null) {
             return "No piece at position " + input;

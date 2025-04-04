@@ -20,8 +20,10 @@ public class GameHandler {
 
     public void loadGame(GameData game) {
         this.chessGame = game.game();
-//        System.out.println("Game updated");
         drawBoard(playerColor, chessGame.getBoard());
+        String boardStr = drawBoard(playerColor, chessGame.getBoard());
+        System.out.println(boardStr);
+
     }
 
 
@@ -209,6 +211,7 @@ public class GameHandler {
         System.out.println(boardOutput);
 
     }
+
 }
 
 
