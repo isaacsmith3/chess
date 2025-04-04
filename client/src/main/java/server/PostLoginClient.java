@@ -19,6 +19,7 @@ public class PostLoginClient {
     private String authToken;
     private List<ListGamesResult> cachedGames;
 
+
     public PostLoginClient(String serverUrl) {
         this.serverFacade = new ServerFacade(serverUrl);
     }

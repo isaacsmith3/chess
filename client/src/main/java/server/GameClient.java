@@ -5,32 +5,51 @@ import chess.ChessGame;
 import chess.ChessPiece;
 import chess.ChessPosition;
 import exception.ResponseException;
+import model.AuthData;
+import org.eclipse.jetty.websocket.client.WebSocketClient;
+import org.eclipse.jetty.websocket.common.WebSocketFrame;
 import types.ListGamesResult;
 import ui.EscapeSequences;
+import websocket.GameHandler;
+import websocket.WebSocketFacade;
 
+import java.rmi.ServerException;
 import java.util.Collection;
 
 public class GameClient {
     private final ServerFacade serverFacade;
-    private final String playerColor;
+    private String playerColor = null;
     private final int gameId;
     private ChessGame chessGame;
-    private String authToken;
+//    private String authToken;
     private boolean isObserving;
+    private String serverUrl;
 
+    private GameHandler gameHandler;
+    private WebSocketFacade webSocketFacade;
+    private AuthData authData;
 
-    public GameClient(String serverUrl, String playerColor, String gameId, boolean isObserving) {
+    public GameClient(String serverUrl, String playerColor, String gameId, boolean isObserving, AuthData authData) throws ServerException {
+        this.serverUrl = serverUrl;
         this.serverFacade = new ServerFacade(serverUrl);
-        this.playerColor = playerColor;
         this.gameId = Integer.parseInt(gameId);
         this.chessGame = new ChessGame();
         this.isObserving = isObserving;
+        this.gameHandler = new GameHandler();
+        this.webSocketFacade = new WebSocketFacade(serverUrl, gameHandler);
+        this.authData = authData;
+
+        if (!isObserving) {
+            this.playerColor = playerColor;
+        }
+
+        this.webSocketFacade.connect(this.authData.authToken(), this.gameId, playerColor, this.authData.userName());
 
     }
 
-    public void setAuthToken(String authToken) {
-        this.authToken = authToken;
-    }
+//    public void setAuthToken(String authToken) {
+//        this.authToken = authToken;
+//    }
 
     public String eval(String input) {
         String[] tokens = input.split(" ");
@@ -52,9 +71,11 @@ public class GameClient {
         output.append("Help Menu:\n");
         output.append("help - print this message again :)\n");
         output.append("draw - redraw the board\n");
+        output.append("highlight - highlight the legal moves\n");
+        output.append("move - make a move\n");
+        output.append("resign - resign and leave the game\n");
         output.append("leave - leave the game\n");
         output.append("quit - quit the program\n");
-
         return output.toString();
     }
 

@@ -1,5 +1,7 @@
 package server;
 
+import model.AuthData;
+
 import java.util.Scanner;
 
 enum State { PRE_LOGIN, POST_LOGIN, GAME }
@@ -64,8 +66,8 @@ public class Repl {
                                 String[] tokens = input.split(" ");
                                 String gameId = tokens[1];
                                 String playerColor = tokens[2];
-                                this.gameClient = new GameClient(serverUrl, playerColor, gameId, false);
-                                this.gameClient.setAuthToken(authToken);
+                                this.gameClient = new GameClient(serverUrl, playerColor, gameId, false, new AuthData(this.authToken, playerColor));
+//                                this.gameClient.setAuthToken(authToken);
                                 currentState = State.GAME;
                                 System.out.println(result);
                                 System.out.println("\n");
