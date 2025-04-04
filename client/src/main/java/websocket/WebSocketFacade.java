@@ -1,7 +1,11 @@
 package websocket;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import websocket.commands.ConnectCommand;
+import websocket.commands.LeaveCommand;
+import websocket.commands.UserGameCommand;
 import websocket.messages.LoadGame;
 import websocket.messages.Notification;
 import websocket.messages.ServerMessage;
@@ -17,60 +21,104 @@ public class WebSocketFacade extends Endpoint {
     Session session;
     String playerColor = null;
     GameHandler gameHandler;
+    private final String serverUrl;
 
-    public WebSocketFacade(String url, GameHandler gameHandler) throws ServerException {
-        try {
-            url = url.replace("http", "ws");
-            URI socketURI = new URI(url + "/ws");
-
-            WebSocketContainer container = ContainerProvider.getWebSocketContainer();
-            this.session = container.connectToServer(this, socketURI);
-            this.gameHandler = gameHandler;
-
-            //set message handler
-            this.session.addMessageHandler(new MessageHandler.Whole<String>() {
-                @Override
-                public void onMessage(String message) {
-                    ServerMessage serverMessage = new Gson().fromJson(message, ServerMessage.class);
-                    switch (serverMessage.getServerMessageType()) {
-                        case NOTIFICATION -> gameHandler.send(new Gson().fromJson(message, Notification.class));
-                        case ERROR -> gameHandler.error(new Gson().fromJson(message, Error.class));
-                        case LOAD_GAME -> loadGame(new Gson().fromJson(message, LoadGame.class));
-                    }
-                }
-            });
-
-
-        } catch (DeploymentException | IOException | URISyntaxException ex) {
-            throw new ServerException(ex.getMessage());
-        }
+    public WebSocketFacade(String serverUrl, GameHandler gameHandler) throws ServerException {
+        this.serverUrl = serverUrl.replace("http", "ws");
+        this.gameHandler = gameHandler;
     }
-
-    private void loadGame(LoadGame loadGameMessage) {
-//        if (loadGameMessage.resign){
-//            gameplay.endGame();
-//            System.out.println("Press anything to continue");
-//            return;
-//        }
-//        gameplay.updateGame(loadGameMessage.game);
-//        gameplay.printBoard(playerColor);
-//        gameplay.checkWin();
-    }
-
 
     @Override
     public void onOpen(Session session, EndpointConfig endpointConfig) {
+        System.out.println("WebSocket opened");
+    }
+
+    @Override
+    public void onClose(Session session, CloseReason closeReason) {
+        System.out.println("WebSocket connection closed: " + closeReason.getReasonPhrase());
+    }
+
+    @Override
+    public void onError(Session session, Throwable throwable) {
+        System.err.println("WebSocket error: " + throwable.getMessage());
+        throwable.printStackTrace();
     }
 
     public void connect(String authToken, int gameId, String playerColor, String username) {
-        this.playerColor = playerColor;
         try {
-            ConnectCommand cmd = new ConnectCommand(authToken, username, playerColor, gameId);
-            this.session.getBasicRemote().sendText(new Gson().toJson(cmd));
-//            this.session.close();
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        }
+            this.playerColor = playerColor;
+            this.gameHandler.setPlayerColor(playerColor);
 
+            URI socketURI = new URI(serverUrl + "/ws");
+
+            WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+            this.session = container.connectToServer(this, socketURI);
+
+            this.session.addMessageHandler(new MessageHandler.Whole<String>() {
+                @Override
+                public void onMessage(String message) {
+                    handleServerMessage(message);
+                }
+            });
+
+            ConnectCommand cmd = new ConnectCommand(authToken, username, playerColor, gameId);
+            sendCommand(cmd);
+
+        } catch (DeploymentException | IOException | URISyntaxException ex) {
+            System.err.println("WebSocket connection error: " + ex.getMessage());
+            ex.printStackTrace();
+        }
     }
+
+    private void handleServerMessage(String rawMessage) {
+        try {
+            JsonObject jsonMsg = new Gson().fromJson(rawMessage, JsonObject.class);
+
+            String typeStr = jsonMsg.get("serverMessageType").getAsString();
+
+            if (typeStr.equals("LOAD_GAME")) {
+                gameHandler.loadGame(new Gson().fromJson(rawMessage, LoadGame.class).getGame());
+            }
+            else if (typeStr.equals("NOTIFICATION")) {
+                gameHandler.send(new Gson().fromJson(rawMessage, Notification.class));
+            }
+            else if (typeStr.equals("ERROR")) {
+                String errorMsg = "Unknown error";
+
+                if (jsonMsg.has("errorMessage")) {
+                    JsonElement errorElem = jsonMsg.get("errorMessage");
+
+                    if (errorElem.isJsonPrimitive()) {
+
+                        errorMsg = errorElem.getAsJsonPrimitive().toString();
+                    }
+                }
+
+                gameHandler.error(new websocket.messages.Error(
+                        ServerMessage.ServerMessageType.ERROR, errorMsg));
+            }
+        } catch (Exception e) {
+            System.err.println("Error processing the message: " + e.getMessage());
+
+            e.printStackTrace();
+        }
+    }
+
+
+
+    public void leave(String authToken, int gameId) throws IOException {
+        LeaveCommand command = new LeaveCommand(
+                UserGameCommand.CommandType.LEAVE,
+                authToken,
+                gameId
+        );
+        sendCommand(command);
+    }
+
+    private void sendCommand(UserGameCommand command) throws IOException {
+        Gson gson = new Gson();
+        String commandJson = gson.toJson(command);
+        this.session.getBasicRemote().sendText(commandJson);
+    }
+
 }

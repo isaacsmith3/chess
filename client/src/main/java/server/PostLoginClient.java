@@ -126,6 +126,23 @@ public class PostLoginClient {
         }
     }
 
+    int getActualGameId(String gameId) throws Exception {
+        int displayedGameId = parseInt(gameId);
+
+        if (cachedGames == null || cachedGames.isEmpty()) {
+            Collection<ListGamesResult> gamesCollection = serverFacade.listGames(authToken);
+            this.cachedGames = new ArrayList<>(gamesCollection);
+        }
+
+        if (displayedGameId < 0 || displayedGameId >= cachedGames.size()) {
+            throw new Exception("Invalid Game Id");
+        }
+
+        ListGamesResult selectedGame = cachedGames.get(displayedGameId);
+
+        return selectedGame.gameID();
+    }
+
     public String createGame(String gameName, String authToken) {
         try {
             serverFacade.createGame(gameName, authToken);
