@@ -59,6 +59,8 @@ public class GameClient {
                 return helpObserver();
             case "draw":
                 return gameHandler.drawBoard(this.playerColor, this.gameHandler.chessGame.getBoard());
+            case "highlight":
+                return highlight();
             case "leave":
                 webSocketFacade.leave(authData.authToken(), gameId);
                 return "Left game successfully";
@@ -84,6 +86,7 @@ public class GameClient {
         output.append("Help Menu:\n");
         output.append("help - print this message again :)\n");
         output.append("draw - redraw the board\n");
+        output.append("highlight - highlight the legal moves\n");
         output.append("leave - leave the game\n");
         output.append("quit - quit the program\n");
         return output.toString();
@@ -220,7 +223,6 @@ public class GameClient {
         if (gameHandler.chessGame.isGameOver() || gameHandler.gameOver) {
             return "Game not running";
         }
-        gameHandler.gameOver = true;
 
         Scanner scanner = new Scanner(System.in);
         System.out.println("Are you sure you want to resign? (y/n):");
@@ -228,7 +230,7 @@ public class GameClient {
 
         if (input.equals("y")) {
             webSocketFacade.resign(authData.authToken(), gameId);
-//            webSocketFacade.leave(authData.authToken(), gameId);
+            gameHandler.gameOver = true;
             return "Resigned.";
         } else if (input.equals("n")) {
             return "Good choice. Never give up.";

@@ -1,6 +1,7 @@
 package server.websocket;
 
 import chess.ChessGame;
+import chess.ChessPosition;
 import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import dataaccess.AuthTokenDAO;
@@ -24,7 +25,7 @@ import java.io.IOException;
 public class WebSocketHandler {
 
     // Session
-//    public boolean gameOver;
+    public boolean gameOver;
     private final GameService gameService;
     private final ConnectionManager connectionManager = new ConnectionManager();
 
@@ -83,25 +84,33 @@ public class WebSocketHandler {
 
                 boolean isWhitePlayer = username.equals(gameData.whiteUsername());
                 boolean isBlackPlayer = username.equals(gameData.blackUsername());
+                boolean isObserver = !isWhitePlayer && !isBlackPlayer;
 
                 if (isWhitePlayer || isBlackPlayer) {
                     String playerColor = isWhitePlayer ? "WHITE" : "BLACK";
                     gameService.leaveGame(cmd.getAuthToken(), new UpdateGameRequest(cmd.getGameID(), playerColor, gameData.game()));
-                }
-
-                String message = username + " left the game";
-                Notification notification = new Notification(
-                        ServerMessage.ServerMessageType.NOTIFICATION,
-                        message
-                );
-
-                for (Connection connection : connectionManager.connections.values()) {
-                    if (connection.gameId == cmd.getGameID() && !connection.authToken.equals(cmd.getAuthToken())) {
-                        connectionManager.sendMessage(connection.authToken, notification);
-                    }
+                    String message = username + " stopped playing the game";
+                    Notification notification = new Notification(
+                            ServerMessage.ServerMessageType.NOTIFICATION,
+                            message
+                    );
+                    connectionManager.broadcast(cmd.getAuthToken(), notification, cmd.getGameID());
+                } else if (isObserver) {
+                    String message = username + " stopped observing the game";
+                    Notification notification = new Notification(
+                            ServerMessage.ServerMessageType.NOTIFICATION,
+                            message
+                    );
+                    connectionManager.broadcast(cmd.getAuthToken(), notification, cmd.getGameID());
                 }
 
                 connectionManager.connections.remove(cmd.getAuthToken());
+
+                Notification confirmation = new Notification(
+                        ServerMessage.ServerMessageType.NOTIFICATION,
+                        "You have left the game"
+                );
+                connectionManager.sendMessage(cmd.getAuthToken(), confirmation);
 
             }
         } catch (Exception e) {
@@ -261,11 +270,14 @@ public class WebSocketHandler {
                 }
             }
 
-            Notification moveNotification = new Notification(
+            String startSquare = formatPositionToAlgebraic(cmd.move.getStartPosition());
+            String endSquare = formatPositionToAlgebraic(cmd.move.getEndPosition());
+
+            Notification notification = new Notification(
                     ServerMessage.ServerMessageType.NOTIFICATION,
-                    username + " moved from " + cmd.getMove().getStartPosition() + " to " + cmd.getMove().getEndPosition()
+                    username + " moved from " + startSquare + " to " + endSquare
             );
-            connectionManager.broadcast(cmd.getAuthToken(), moveNotification, cmd.getGameID());
+            connectionManager.broadcast(cmd.getAuthToken(), notification, cmd.getGameID());
 
             ChessGame.TeamColor opposingTeam = updatedChessGame.getTeamTurn();
 
@@ -361,6 +373,13 @@ public class WebSocketHandler {
             e.printStackTrace();
         }
     }
+
+    private String formatPositionToAlgebraic(ChessPosition position) {
+        char file = (char)('a' + position.getColumn() - 1);
+        int rank = position.getRow();
+        return file + "" + rank;
+    }
+
 
 
 }

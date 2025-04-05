@@ -170,18 +170,22 @@ public class Repl {
         this.playerColor = null;
 
         System.out.println(result);
-        return State.POST_LOGIN;
+        System.out.println("\n");
+        System.out.println(gameClient.help());
+        return State.GAME;
     }
+
 
     private State handleGameState(String input) throws IOException {
         String result;
 
         if (playerColor != null) {
             result = gameClient.eval(input);
-            System.out.println(result);
         } else {
             result = gameClient.evalObserver(input);
         }
+
+        System.out.println(result);
 
         if (result.startsWith("Left")) {
             return State.POST_LOGIN;
@@ -189,7 +193,6 @@ public class Repl {
 
         return State.GAME;
     }
-
 
     private void printPrompt() {
         System.out.print("\n" + ">>> ");
@@ -201,7 +204,6 @@ public class Repl {
 
             if (parts.length >= 2) {
                 this.authToken = parts[1].trim();
-//                this.username = parts[2].trim();
 
                 if (parts.length >= 3) {
                     return new String[]{parts[2].trim()};

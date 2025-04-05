@@ -1,12 +1,6 @@
 package server;
-
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
 import exception.ResponseException;
 import types.ListGamesResult;
-import ui.EscapeSequences;
 import websocket.GameHandler;
 
 import java.util.ArrayList;
@@ -20,7 +14,6 @@ public class PostLoginClient {
     private String authToken;
     private List<ListGamesResult> cachedGames;
     GameHandler gameHandler;
-
 
     public PostLoginClient(String serverUrl) {
         this.serverFacade = new ServerFacade(serverUrl);
