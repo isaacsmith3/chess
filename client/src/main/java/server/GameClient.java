@@ -52,8 +52,8 @@ public class GameClient {
                 return highlight();
             case "move":
                 return makeMove();
-
-
+            case "resign":
+                return resign();
 
         }
         return "Invalid command";
@@ -73,7 +73,7 @@ public class GameClient {
     }
 
     private String makeMove() {
-        if (!gameHandler.isGameRunning()) {
+        if (gameHandler.chessGame.isGameOver()) {
             return "Game not running";
         }
 
@@ -189,7 +189,7 @@ public class GameClient {
     }
 
     private String highlight() {
-        if (!gameHandler.isGameRunning()) {
+        if (gameHandler.chessGame.isGameOver()) {
             return "Game not running";
         }
 
@@ -201,7 +201,8 @@ public class GameClient {
         if (input.length() != 2 ||
                 !Character.isLetter(input.charAt(0)) ||
                 !Character.isDigit(input.charAt(1))) {
-            return "Invalid position format. Use format like 'e2'";
+            System.out.println("Invalid position format. Use format like 'e2'.");
+            return highlight();
         }
 
         char fileLetter = input.charAt(0);
@@ -223,6 +224,27 @@ public class GameClient {
         return "Highlighted valid moves for piece at " + input;
 
 
+    }
+
+    private String resign() throws IOException {
+        if (gameHandler.chessGame.isGameOver()) {
+            return "Game not running";
+        }
+
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Are you sure you want to resign? (y/n):");
+        String input = scanner.nextLine().toLowerCase().trim();
+
+        if (input.equals("y")) {
+            webSocketFacade.resign(authData.authToken(), gameId);
+            webSocketFacade.leave(authData.authToken(), gameId);
+            return "Left game and resigned.";
+        } else if (input.equals("n")) {
+            return "Good choice. Never give up.";
+        } else {
+            System.out.println("Invalid resign. Try again.");
+            return resign();
+        }
     }
 
 }

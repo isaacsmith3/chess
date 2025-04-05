@@ -12,11 +12,6 @@ public class GameHandler {
 
     public ChessGame chessGame;
     private String playerColor;
-    private boolean gameRunning;
-
-    public GameHandler() {
-        this.gameRunning = true;
-    }
 
     public void loadGame(GameData game) {
         this.chessGame = game.game();
@@ -37,10 +32,6 @@ public class GameHandler {
 
     public void setPlayerColor(String color) {
         this.playerColor = color;
-    }
-
-    public ChessGame getChessGame() {
-        return chessGame;
     }
 
     public String drawBoard(String playerColor, ChessBoard board) {
@@ -123,10 +114,6 @@ public class GameHandler {
             case PAWN: return "P";
             default: return " ";
         }
-    }
-
-    public boolean isGameRunning() {
-        return gameRunning;
     }
 
     public void highlight(ChessPiece piece, ChessPosition position, Boolean isBlack) {

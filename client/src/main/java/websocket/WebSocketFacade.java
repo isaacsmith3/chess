@@ -4,10 +4,7 @@ import chess.ChessMove;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import websocket.commands.ConnectCommand;
-import websocket.commands.LeaveCommand;
-import websocket.commands.MakeMoveCommand;
-import websocket.commands.UserGameCommand;
+import websocket.commands.*;
 import websocket.messages.LoadGame;
 import websocket.messages.Notification;
 import websocket.messages.ServerMessage;
@@ -134,5 +131,9 @@ public class WebSocketFacade extends Endpoint {
         sendCommand(command);
     }
 
+    public void resign(String authToken, int gameId) throws IOException {
+        ResignCommand command = new ResignCommand(UserGameCommand.CommandType.RESIGN, authToken, gameId);
+        sendCommand(command);
+    }
 
 }
