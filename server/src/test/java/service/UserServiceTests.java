@@ -69,45 +69,5 @@ public class UserServiceTests {
 
     }
 
-//    @Test
-//    public void positiveTestLogin() throws UserService.InvalidCredentialsException, UserService.DuplicateUserException {
-//        userService.register(new UserData("isaac", "password", "email"));
-//        Collection<UserData> userDataCollection = userDAO.getAllUsers();
-//        assertTrue(userDataCollection.size() == 1);
-//        assertTrue(userDataCollection.contains(new UserData("isaac", "password", "email")));
-//
-//        Collection<AuthData> authDataCollection = (Collection<AuthData>) authTokenDAO.getAuthTokens();
-//        String auth = String.valueOf(authDataCollection.iterator().next().authToken());
-//
-//        userService.logout(auth);
-//        authDataCollection = (Collection<AuthData>) authTokenDAO.getAuthTokens();
-//        assertTrue(authDataCollection.isEmpty());
-//
-//        userService.login(new UserData("isaac", "password", "email"));
-//        authDataCollection = (Collection<AuthData>) authTokenDAO.getAuthTokens();
-//        assertTrue(authDataCollection.size() == 1);
-//        userDataCollection = (Collection<UserData>) userDAO.getAllUsers();
-//        assertTrue(userDataCollection.size() == 1);
-//        assertTrue(userDataCollection.contains(new UserData("isaac", "password", "email")));
-//    }
-//
-//    @Test public void negativeTestLogin() throws UserService.InvalidCredentialsException, UserService.DuplicateUserException {
-//        userService.register(new UserData("isaac", "password", "email"));
-//        Collection<UserData> userDataCollection = userDAO.getAllUsers();
-//        assertTrue(userDataCollection.size() == 1);
-//        assertTrue(userDataCollection.contains(new UserData("isaac", "password", "email")));
-//
-//        Collection<AuthData> authDataCollection = (Collection<AuthData>) authTokenDAO.getAuthTokens();
-//        String auth = String.valueOf(authDataCollection.iterator().next().authToken());
-//
-//        userService.logout(auth);
-//        authDataCollection = (Collection<AuthData>) authTokenDAO.getAuthTokens();
-//        assertTrue(authDataCollection.isEmpty());
-//
-//        assertThrows(UserService.InvalidCredentialsException.class, () -> {
-//            userService.login(new UserData("isaac", "1234", "email"));
-//        });
-//    }
-
 
 }

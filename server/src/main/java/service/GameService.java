@@ -80,17 +80,17 @@ public class GameService {
             if (game.whiteUsername() == null) {
                 updatedGame = new GameData(game.gameID(), verifiedAuth.userName(), game.blackUsername(), game.gameName(), game.game());
             } else {
-                throw new InvalidGameException("White player already exists");
+                throw new InvalidGameException("White player already exists (get)");
             }
         } else if (Objects.equals(playerColor, "BLACK")) {
             if (game.blackUsername() == null) {
                 updatedGame = new GameData(game.gameID(), game.whiteUsername(), verifiedAuth.userName(), game.gameName(), game.game());
             } else {
-                throw new InvalidGameException("Black player already exists");
+                throw new InvalidGameException("Black player already exists (get)");
             }
         }
         else {
-            throw new InvalidCredentialsException("Team color must be WHITE or BLACk");
+            throw new InvalidCredentialsException("Team color must be WHITE or BLACk (get)");
         }
         return updatedGame;
     }
