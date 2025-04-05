@@ -68,7 +68,7 @@ public class PreLoginClient {
         try {
             UserData userData = new UserData(username, password, null);
             AuthResult authResult = serverFacade.login(userData);
-            return "AUTH_TOKEN:" + authResult.authToken() + ":Successfully Logged In\n";
+            return "AUTH_TOKEN:" + authResult.authToken() + ":Successfully Logged In";
         } catch (ResponseException e) {
             return "ERROR:" + e.getMessage();
         }

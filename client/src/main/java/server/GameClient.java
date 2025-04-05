@@ -13,27 +13,18 @@ import java.util.Scanner;
 public class GameClient {
     private String playerColor = null;
     private final int gameId;
-    private boolean isObserving;
-    private String serverUrl;
     private GameHandler gameHandler;
     private WebSocketFacade webSocketFacade;
     private AuthData authData;
 
-    public GameClient(String serverUrl, String playerColor, int gameId, boolean isObserving, AuthData authData) throws ServerException {
-        this.serverUrl = serverUrl;
+    public GameClient(String serverUrl, String playerColor, int gameId, AuthData authData) throws ServerException {
         this.gameId = gameId;
-        this.isObserving = isObserving;
         this.gameHandler = new GameHandler();
         this.gameHandler.setPlayerColor(playerColor);
         this.webSocketFacade = new WebSocketFacade(serverUrl, gameHandler);
         this.authData = authData;
-
-        if (!isObserving) {
-            this.playerColor = playerColor;
-        }
-
+        this.playerColor = playerColor;
         this.webSocketFacade.connect(this.authData.authToken(), this.gameId, playerColor, this.authData.userName());
-
     }
 
     public String eval(String input) throws IOException {
@@ -59,6 +50,22 @@ public class GameClient {
         return "Invalid command";
     }
 
+    public String evalObserver(String input) throws IOException {
+        String[] tokens = input.split(" ");
+        String command = tokens[0].toLowerCase();
+
+        switch (command) {
+            case "help":
+                return helpObserver();
+            case "draw":
+                return gameHandler.drawBoard(this.playerColor, this.gameHandler.chessGame.getBoard());
+            case "leave":
+                webSocketFacade.leave(authData.authToken(), gameId);
+                return "Left game successfully";
+        }
+        return "Invalid command";
+    }
+
     public String help() {
         var output = new StringBuilder();
         output.append("Help Menu:\n");
@@ -67,6 +74,16 @@ public class GameClient {
         output.append("highlight - highlight the legal moves\n");
         output.append("move - make a move\n");
         output.append("resign - resign and leave the game\n");
+        output.append("leave - leave the game\n");
+        output.append("quit - quit the program\n");
+        return output.toString();
+    }
+
+    public String helpObserver() {
+        var output = new StringBuilder();
+        output.append("Help Menu:\n");
+        output.append("help - print this message again :)\n");
+        output.append("draw - redraw the board\n");
         output.append("leave - leave the game\n");
         output.append("quit - quit the program\n");
         return output.toString();
@@ -84,7 +101,7 @@ public class GameClient {
 
         Scanner scanner = new Scanner(System.in);
 
-        System.out.println("Enter piece position (e.g., e2):");
+        System.out.println("Enter piece position (like 'e2'):");
 
         String startInput = scanner.nextLine().toLowerCase().trim();
 
@@ -132,7 +149,7 @@ public class GameClient {
             i++;
         }
 
-        System.out.println("Enter destination position (e.g., e4):");
+        System.out.println("Enter destination position (like 'e4'):");
         String endInput = scanner.nextLine().toLowerCase().trim();
 
         if (endInput.length() != 2 ||
