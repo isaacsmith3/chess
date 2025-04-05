@@ -87,7 +87,6 @@ public class MySQLGameDAO implements GameDAO {
 
     public void updateGame(GameData updatedGame) {
         try (Connection conn = databaseManager.getConnection()) {
-            // Add gameName to your update SQL
             String sql = "UPDATE games SET whiteUserName = ?, blackUserName = ?, gameName = ?, jsonChessGame = ? WHERE gameID = ?";
 
             try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -102,7 +101,7 @@ public class MySQLGameDAO implements GameDAO {
                     ps.setString(2, updatedGame.blackUsername());
                 }
                 ps.setString(3, updatedGame.gameName());
-                ps.setString(4, new Gson().toJson(updatedGame.game()));
+                ps.setString(4, new Gson().toJson(updatedGame.game(), ChessGame.class));
                 ps.setInt(5, updatedGame.gameID());
                 ps.executeUpdate();
             } catch (SQLException e) {

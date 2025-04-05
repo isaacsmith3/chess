@@ -90,7 +90,7 @@ public class GameClient {
     }
 
     private String makeMove() {
-        if (gameHandler.chessGame.isGameOver()) {
+        if (gameHandler.chessGame.isGameOver() || gameHandler.gameOver) {
             return "Game not running";
         }
 
@@ -206,7 +206,7 @@ public class GameClient {
     }
 
     private String highlight() {
-        if (gameHandler.chessGame.isGameOver()) {
+        if (gameHandler.chessGame.isGameOver() || gameHandler.gameOver) {
             return "Game not running";
         }
 
@@ -244,9 +244,10 @@ public class GameClient {
     }
 
     private String resign() throws IOException {
-        if (gameHandler.chessGame.isGameOver()) {
+        if (gameHandler.chessGame.isGameOver() || gameHandler.gameOver) {
             return "Game not running";
         }
+        gameHandler.gameOver = true;
 
         Scanner scanner = new Scanner(System.in);
         System.out.println("Are you sure you want to resign? (y/n):");
@@ -254,8 +255,8 @@ public class GameClient {
 
         if (input.equals("y")) {
             webSocketFacade.resign(authData.authToken(), gameId);
-            webSocketFacade.leave(authData.authToken(), gameId);
-            return "Left game and resigned.";
+//            webSocketFacade.leave(authData.authToken(), gameId);
+            return "Resigned.";
         } else if (input.equals("n")) {
             return "Good choice. Never give up.";
         } else {

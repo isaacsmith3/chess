@@ -10,6 +10,7 @@ import java.util.Collection;
 
 public class GameHandler {
 
+    public boolean gameOver;
     public ChessGame chessGame;
     private String playerColor;
 

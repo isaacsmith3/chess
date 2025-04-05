@@ -1,5 +1,7 @@
 package chess;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -13,6 +15,8 @@ public class ChessGame {
 
     public TeamColor currentTurn;
     private ChessBoard board;
+
+    @SerializedName("gameOver")
     private boolean gameOver;
 
     public ChessGame() {

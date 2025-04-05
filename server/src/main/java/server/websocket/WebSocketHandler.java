@@ -24,12 +24,13 @@ import java.io.IOException;
 public class WebSocketHandler {
 
     // Session
-
+//    public boolean gameOver;
     private final GameService gameService;
     private final ConnectionManager connectionManager = new ConnectionManager();
 
     public WebSocketHandler(GameDAO gameDAO, AuthTokenDAO authTokenDAO) {
         this.gameService = new GameService(gameDAO, authTokenDAO);
+//        this.gameOver = false;
     }
 
     @OnWebSocketClose
@@ -289,6 +290,14 @@ public class WebSocketHandler {
 
         try {
             GameData game = gameService.getGame(new JoinGameRequest(cmd.getGameID(), null));
+
+            if (game != null && game.game().isGameOver()) {
+                Notification notification = new Notification(
+                        ServerMessage.ServerMessageType.NOTIFICATION,
+                        "This game has already ended"
+                );
+                connectionManager.sendMessage(cmd.getAuthToken(), notification);
+            }
 
             if (game == null) {
                 Error errorMessage = new Error(ServerMessage.ServerMessageType.ERROR, "Error: game not found");
