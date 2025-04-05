@@ -75,6 +75,13 @@ public class Repl {
     }
 
     private State handlePreLoginState(String input) {
+        String[] tokens = input.split(" ");
+        if (tokens.length >= 2 &&
+                (tokens[0].equalsIgnoreCase("login") ||
+                        tokens[0].equalsIgnoreCase("register"))) {
+            this.username = tokens[1]; // Set username from command
+        }
+
         String result = preLoginClient.eval(input);
         String[] parsedResult = parseAuthMessage(result);
 
@@ -190,11 +197,11 @@ public class Repl {
 
     private String[] parseAuthMessage(String message) {
         if (message.startsWith("AUTH_TOKEN:")) {
-            String[] parts = message.split(":", 4);
+            String[] parts = message.split(":", 3);
 
             if (parts.length >= 2) {
                 this.authToken = parts[1].trim();
-                this.username = parts[2].trim();
+//                this.username = parts[2].trim();
 
                 if (parts.length >= 3) {
                     return new String[]{parts[2].trim()};

@@ -249,10 +249,10 @@ public class WebSocketHandler {
             }
 
             chessGame.makeMove(cmd.getMove());
-
             gameService.updateGame(cmd.getAuthToken(), new UpdateGameRequest(cmd.getGameID(), null, chessGame));
 
             GameData updatedGame = gameService.getGame(new JoinGameRequest(cmd.getGameID(), null));
+            ChessGame updatedChessGame = updatedGame.game();
 
             LoadGame loadGameMessage = new LoadGame(updatedGame);
             for (Connection connection : connectionManager.connections.values()) {
@@ -261,11 +261,43 @@ public class WebSocketHandler {
                 }
             }
 
-            Notification notification = new Notification(
+            Notification moveNotification = new Notification(
                     ServerMessage.ServerMessageType.NOTIFICATION,
-                    "A move was made from " + cmd.move.getStartPosition() + " to " + cmd.move.getEndPosition()
+                    username + " moved from " + cmd.getMove().getStartPosition() + " to " + cmd.getMove().getEndPosition()
             );
-            connectionManager.broadcast(cmd.getAuthToken(), notification, cmd.getGameID());
+            connectionManager.broadcast(cmd.getAuthToken(), moveNotification, cmd.getGameID());
+
+            ChessGame.TeamColor opposingTeam = updatedChessGame.getTeamTurn();
+
+            if (updatedChessGame.isInCheckmate(opposingTeam)) {
+                String checkmatedPlayer = opposingTeam == ChessGame.TeamColor.WHITE ?
+                        updatedGame.whiteUsername() : updatedGame.blackUsername();
+                Notification checkmateNotification = new Notification(
+                        ServerMessage.ServerMessageType.NOTIFICATION,
+                        checkmatedPlayer + " is in checkmate"
+                );
+                for (Connection connection : connectionManager.connections.values()) {
+                    if (connection.gameId == cmd.getGameID()) {
+                        connectionManager.sendMessage(connection.authToken, checkmateNotification);
+                    }
+                }
+
+                updatedChessGame.setGameOver(true);
+                gameService.updateGame(cmd.getAuthToken(), new UpdateGameRequest(cmd.getGameID(), null, updatedChessGame));
+            }
+            else if (updatedChessGame.isInCheck(opposingTeam)) {
+                String checkedPlayer = opposingTeam == ChessGame.TeamColor.WHITE ?
+                        updatedGame.whiteUsername() : updatedGame.blackUsername();
+                Notification checkNotification = new Notification(
+                        ServerMessage.ServerMessageType.NOTIFICATION,
+                        checkedPlayer + " is in check"
+                );
+                for (Connection connection : connectionManager.connections.values()) {
+                    if (connection.gameId == cmd.getGameID()) {
+                        connectionManager.sendMessage(connection.authToken, checkNotification);
+                    }
+                }
+            }
 
         } catch (GameService.InvalidAuthTokenException e){
             Error errorMessage = new Error(ServerMessage.ServerMessageType.ERROR, "Error: invalid auth token");
@@ -280,6 +312,7 @@ public class WebSocketHandler {
             throw new RuntimeException(e);
         }
     }
+
 
     private void connect(ConnectCommand cmd, Session session) throws IOException, GameService.InvalidAuthTokenException {
         if (!gameService.verifyAuthToken(cmd.getAuthToken())) {
@@ -296,7 +329,7 @@ public class WebSocketHandler {
             if (game != null && game.game().isGameOver()) {
                 Notification notification = new Notification(
                         ServerMessage.ServerMessageType.NOTIFICATION,
-                        "This game has already ended"
+                        "This game has already ended."
                 );
                 connectionManager.sendMessage(cmd.getAuthToken(), notification);
             }
@@ -308,9 +341,18 @@ public class WebSocketHandler {
                 LoadGame loadGameMessage = new LoadGame(game);
                 connectionManager.sendMessage(cmd.getAuthToken(), loadGameMessage);
 
+                if (cmd.playerColor == null) {
+                    Notification notification = new Notification(
+                            ServerMessage.ServerMessageType.NOTIFICATION,
+                            cmd.username + " connected to the game as observer"
+                    );
+                    connectionManager.broadcast(cmd.getAuthToken(), notification, cmd.getGameID());
+                    return;
+                }
+
                 Notification notification = new Notification(
                         ServerMessage.ServerMessageType.NOTIFICATION,
-                        cmd.username + " connected to the game"
+                        cmd.username + " connected to the game as " + cmd.playerColor
                 );
                 connectionManager.broadcast(cmd.getAuthToken(), notification, cmd.getGameID());
             }

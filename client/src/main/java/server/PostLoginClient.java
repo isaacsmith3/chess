@@ -68,8 +68,7 @@ public class PostLoginClient {
                 if (tokens.length != 2) {
                     return "Usage: observe <ID>";
                 }
-                ChessGame game = new ChessGame();
-                return gameHandler.drawBoard("WHITE", game.getBoard());
+                return "Joined game as observer\n";
 
         }
         return "Invalid command";
@@ -109,7 +108,7 @@ public class PostLoginClient {
             output.append("| NUM  | GAME NAME             | WHITE PLAYER | BLACK PLAYER |\n");
             output.append("--------------------------------------------------------------\n");
 
-            int number = 0;
+            int number = 1;
             for (ListGamesResult g : games) {
                 String whitePlayer = (g.whiteUsername() != null) ? g.whiteUsername() : "-";
                 String blackPlayer = (g.blackUsername() != null) ? g.blackUsername() : "-";
@@ -130,7 +129,7 @@ public class PostLoginClient {
     }
 
     int getActualGameId(String gameId) throws Exception {
-        int displayedGameId = parseInt(gameId);
+        int displayedGameId = parseInt(gameId) - 1;
 
         if (cachedGames == null || cachedGames.isEmpty()) {
             Collection<ListGamesResult> gamesCollection = serverFacade.listGames(authToken);
@@ -157,7 +156,7 @@ public class PostLoginClient {
 
     public String joinGame(String gameId, String playerColor) {
         try {
-            int displayedGameId = parseInt(gameId);
+            int displayedGameId = parseInt(gameId) - 1;
 
             if (cachedGames == null || cachedGames.isEmpty()) {
                 Collection<ListGamesResult> gamesCollection = serverFacade.listGames(authToken);

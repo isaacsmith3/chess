@@ -35,7 +35,7 @@ public class SQLUserDAOTests {
         mySQLUserDAO.createUser(userData);
         Assertions.assertThrows(DataAccessException.class, () -> mySQLUserDAO.createUser(userData));
     }
-    
+
 
     @Test
     public void negativeTestGetUser() throws DataAccessException {

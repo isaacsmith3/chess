@@ -38,18 +38,24 @@ public class GameHandler {
     public String drawBoard(String playerColor, ChessBoard board) {
         boolean isBlack = playerColor != null && playerColor.equalsIgnoreCase("BLACK");
         StringBuilder boardOutput = new StringBuilder();
+        boardOutput.append("\n");
+        boardOutput.append("\n");
 
         boardOutput.append(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
         boardOutput.append(EscapeSequences.SET_TEXT_COLOR_BLACK);
 
-        boardOutput.append("\n");
         printLetters(isBlack, boardOutput);
+        boardOutput.append("  ");
 
+        boardOutput.append(EscapeSequences.RESET_BG_COLOR);
+        boardOutput.append(EscapeSequences.SET_TEXT_COLOR_BLACK);
         boardOutput.append("\n");
 
         for (int row = 0; row < 8; row++) {
             int displayRow = isBlack ? row + 1 : 8 - row;
 
+            // Set light grey background for row number
+            boardOutput.append(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
             boardOutput.append(EscapeSequences.SET_TEXT_COLOR_BLACK);
             boardOutput.append(displayRow).append(" ");
 
@@ -75,22 +81,29 @@ public class GameHandler {
                 }
             }
 
+            // Set light grey only for the row number at the end
             boardOutput.append(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
-
             boardOutput.append(EscapeSequences.SET_TEXT_COLOR_BLACK);
-            boardOutput.append(" ").append(displayRow).append("\n");
+            boardOutput.append(" ").append(displayRow);
+
+            // Reset background color before newline
+            boardOutput.append(EscapeSequences.RESET_BG_COLOR);
+            boardOutput.append("\n");
         }
 
+        // Set light grey for the bottom letters
+        boardOutput.append(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
         boardOutput.append(EscapeSequences.SET_TEXT_COLOR_BLACK);
-
         printLetters(isBlack, boardOutput);
 
         boardOutput.append(EscapeSequences.RESET_BG_COLOR);
         boardOutput.append(EscapeSequences.RESET_TEXT_COLOR);
+        boardOutput.append("  ");
         boardOutput.append("\n");
 
         return boardOutput.toString();
     }
+
 
     private void printLetters(boolean isBlack, StringBuilder boardOutput) {
         boardOutput.append("  ");
