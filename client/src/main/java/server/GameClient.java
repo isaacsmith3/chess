@@ -93,46 +93,33 @@ public class GameClient {
         if (gameHandler.chessGame.isGameOver() || gameHandler.gameOver) {
             return "Game not running";
         }
-
         String gameTurn = gameHandler.chessGame.getTeamTurn().toString().toLowerCase();
         if(!gameTurn.equals(playerColor)){
             return "Please wait your turn";
         }
-
         Scanner scanner = new Scanner(System.in);
-
         System.out.println("Enter piece position (like 'e2'):");
-
         String startInput = scanner.nextLine().toLowerCase().trim();
-
         if (startInput.length() != 2 ||
                 !Character.isLetter(startInput.charAt(0)) ||
                 !Character.isDigit(startInput.charAt(1))) {
             return "Invalid position format. Use format like 'e2'";
         }
-
         char startColumn = startInput.charAt(0);
         int startRank = Character.getNumericValue(startInput.charAt(1));
-
         int startCol = startColumn - 'a' + 1;
-        int startRow = startRank;
-
-        ChessPosition startPosition = new ChessPosition(startRow, startCol);
+        ChessPosition startPosition = new ChessPosition(startRank, startCol);
         ChessPiece piece = gameHandler.chessGame.getBoard().getPiece(startPosition);
-
         if (piece == null) {
             return "No piece at position " + startInput;
         }
-
         if (piece.getTeamColor() != gameHandler.chessGame.getTeamTurn()) {
             return "That's not your piece to move";
         }
-
         Collection<ChessMove> validMoves = gameHandler.chessGame.validMoves(startPosition);
         if (validMoves.isEmpty()) {
             return "No valid moves for this piece";
         }
-
         System.out.println("Valid moves for " + startInput + ":");
         int i = 1;
         for (ChessMove move : validMoves) {
@@ -140,7 +127,6 @@ public class GameClient {
             char endFile = (char)('a' + endPos.getColumn() - 1);
             int endRank = endPos.getRow();
             System.out.print(i + ". " + endFile + endRank);
-
             if (move.getPromotionPiece() != null) {
                 System.out.println(" (promotes to " + move.getPromotionPiece() + ")");
             } else {
@@ -148,24 +134,17 @@ public class GameClient {
             }
             i++;
         }
-
         System.out.println("Enter destination position (like 'e4'):");
         String endInput = scanner.nextLine().toLowerCase().trim();
-
         if (endInput.length() != 2 ||
                 !Character.isLetter(endInput.charAt(0)) ||
                 !Character.isDigit(endInput.charAt(1))) {
             return "Invalid position format. Use format like 'e4'";
         }
-
         char endFile = endInput.charAt(0);
         int endRank = Character.getNumericValue(endInput.charAt(1));
-
         int endCol = endFile - 'a' + 1;
-        int endRow = endRank;
-
-        ChessPosition endPosition = new ChessPosition(endRow, endCol);
-
+        ChessPosition endPosition = new ChessPosition(endRank, endCol);
         ChessMove selectedMove = null;
         for (ChessMove move : validMoves) {
             if (move.getEndPosition().getRow() == endPosition.getRow() &&
@@ -174,18 +153,14 @@ public class GameClient {
                 break;
             }
         }
-
         if (selectedMove == null) {
             return "Invalid move. That is not a legal destination for this piece.";
         }
-
-        // Deal with promotions
         ChessPiece.PieceType promotionPiece = null;
         if (piece.getPieceType() == ChessPiece.PieceType.PAWN &&
-                (endRow == 8 || endRow == 1)) {
+                (endRank == 8 || endRank == 1)) {
             System.out.println("Choose promotion piece (q=Queen, r=Rook, b=Bishop, n=Knight):");
             String promotion = scanner.nextLine().toLowerCase().trim();
-
             switch (promotion) {
                 case "q": promotionPiece = ChessPiece.PieceType.QUEEN; break;
                 case "r": promotionPiece = ChessPiece.PieceType.ROOK; break;
@@ -194,9 +169,7 @@ public class GameClient {
                 default: return "Invalid promotion piece. Move canceled.";
             }
         }
-
         ChessMove moveToMake = new ChessMove(startPosition, endPosition, promotionPiece);
-
         try {
             webSocketFacade.makeMove(authData.authToken(), gameId, moveToMake);
             return "Move sent: " + startInput + " to " + endInput;

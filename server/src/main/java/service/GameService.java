@@ -134,32 +134,37 @@ public class GameService {
                 throw new InvalidGameRequestException("Game does not exist (update)");
             }
 
-            GameData updatedGame;
-
-            if (Objects.equals(playerColor, "WHITE")) {
-                if (game.whiteUsername() == null) {
-                    updatedGame = new GameData(game.gameID(), verifiedAuth.userName(), game.blackUsername(), game.gameName(), game.game());
-                } else {
-                    throw new InvalidGameException("White player already exists");
-                }
-            } else if (Objects.equals(playerColor, "BLACK")) {
-                if (game.blackUsername() == null) {
-                    updatedGame = new GameData(game.gameID(), game.whiteUsername(), verifiedAuth.userName(), game.gameName(), game.game());
-                } else {
-                    throw new InvalidGameException("Black player already exists");
-                }
-            } else if (playerColor == null) {
-                // This might cause issues with previous code. Here I'm just updating the game through the websocket
-                updatedGame = game;
-            }
-            else {
-                throw new InvalidCredentialsException("Team color must be WHITE or BLACk");
-            }
+            GameData updatedGame = getData(playerColor, game, verifiedAuth);
 
             gameDAO.updateGame(updatedGame);
         } catch (DataAccessException e) {
             throw new InvalidAuthTokenException("Invalid auth token");
         }
+    }
+
+    private GameData getData(String playerColor, GameData game, AuthData verifiedAuth) throws InvalidGameException, InvalidCredentialsException {
+        GameData updatedGame;
+
+        if (Objects.equals(playerColor, "WHITE")) {
+            if (game.whiteUsername() == null) {
+                updatedGame = new GameData(game.gameID(), verifiedAuth.userName(), game.blackUsername(), game.gameName(), game.game());
+            } else {
+                throw new InvalidGameException("White player already exists");
+            }
+        } else if (Objects.equals(playerColor, "BLACK")) {
+            if (game.blackUsername() == null) {
+                updatedGame = new GameData(game.gameID(), game.whiteUsername(), verifiedAuth.userName(), game.gameName(), game.game());
+            } else {
+                throw new InvalidGameException("Black player already exists");
+            }
+        } else if (playerColor == null) {
+            // This might cause issues with previous code. Here I'm just updating the game through the websocket
+            updatedGame = game;
+        }
+        else {
+            throw new InvalidCredentialsException("Team color must be WHITE or BLACk");
+        }
+        return updatedGame;
     }
 
     public void leaveGame(String authToken, UpdateGameRequest gameRequest)
