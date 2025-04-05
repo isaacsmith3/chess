@@ -81,14 +81,6 @@ public class WebSocketHandler {
                 AuthData authData = gameService.getUserNameByAuthToken(cmd.getAuthToken());
                 String username = authData.userName();
 
-                ChessGame chessGame = gameData.game();
-
-//                if (chessGame.isGameOver()) {
-//                    Error errorMessage = new Error(ServerMessage.ServerMessageType.ERROR, "Error: game is already over");
-//                    connectionManager.sendMessage(cmd.getAuthToken(), errorMessage);
-//                    return;
-//                }
-
                 boolean isWhitePlayer = username.equals(gameData.whiteUsername());
                 boolean isBlackPlayer = username.equals(gameData.blackUsername());
 
@@ -127,18 +119,12 @@ public class WebSocketHandler {
         }
 
         try {
-            GameData gameData = gameService.getGame(new JoinGameRequest(cmd.getGameID(), null));
-
-            if (gameData == null) {
-                Error errorMessage = new Error(ServerMessage.ServerMessageType.ERROR, "Error: game not found");
-                connectionManager.sendMessage(cmd.getAuthToken(), errorMessage);
+            Result result = getResult(cmd);
+            if (result == null) {
                 return;
             }
 
-            AuthData authData = gameService.getUserNameByAuthToken(cmd.getAuthToken());
-            String username = authData.userName();
-
-            ChessGame chessGame = gameData.game();
+            ChessGame chessGame = result.gameData().game();
 
             if (chessGame.isGameOver()) {
                 Error errorMessage = new Error(ServerMessage.ServerMessageType.ERROR, "Error: game is already over");
@@ -146,8 +132,8 @@ public class WebSocketHandler {
                 return;
             }
 
-            boolean isWhitePlayer = username.equals(gameData.whiteUsername());
-            boolean isBlackPlayer = username.equals(gameData.blackUsername());
+            boolean isWhitePlayer = result.username().equals(result.gameData().whiteUsername());
+            boolean isBlackPlayer = result.username().equals(result.gameData().blackUsername());
 
             if (!isWhitePlayer && !isBlackPlayer) {
                 Error errorMessage = new Error(ServerMessage.ServerMessageType.ERROR, "Error: only players can resign");
@@ -171,7 +157,7 @@ public class WebSocketHandler {
 
             gameService.updateGame(cmd.getAuthToken(), new UpdateGameRequest(cmd.getGameID(), null, chessGame));
 
-            String message = username + " resigned the game";
+            String message = result.username() + " resigned the game";
             Notification notification = new Notification(
                     ServerMessage.ServerMessageType.NOTIFICATION,
                     message
@@ -191,6 +177,24 @@ public class WebSocketHandler {
             throw new RuntimeException(e);
         }
 
+    }
+
+    private Result getResult(ResignCommand cmd) throws GameService.InvalidAuthTokenException, IOException {
+        GameData gameData = gameService.getGame(new JoinGameRequest(cmd.getGameID(), null));
+
+        if (gameData == null) {
+            Error errorMessage = new Error(ServerMessage.ServerMessageType.ERROR, "Error: game not found");
+            connectionManager.sendMessage(cmd.getAuthToken(), errorMessage);
+            return null;
+        }
+
+        AuthData authData = gameService.getUserNameByAuthToken(cmd.getAuthToken());
+        String username = authData.userName();
+        Result result = new Result(gameData, username);
+        return result;
+    }
+
+    private record Result(GameData gameData, String username) {
     }
 
     private void makeMove(MakeMoveCommand cmd, Session session) throws GameService.InvalidAuthTokenException, IOException {
@@ -272,9 +276,7 @@ public class WebSocketHandler {
         } catch (GameService.InvalidGameException e) {
             Error errorMessage = new Error(ServerMessage.ServerMessageType.ERROR, "Error: invalid game");
             connectionManager.sendMessage(cmd.getAuthToken(), errorMessage);
-        } catch (GameService.InvalidCredentialsException e) {
-            throw new RuntimeException(e);
-        } catch (GameService.InvalidGameRequestException e) {
+        } catch (GameService.InvalidCredentialsException | GameService.InvalidGameRequestException e) {
             throw new RuntimeException(e);
         }
     }

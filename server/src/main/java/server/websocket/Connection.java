@@ -10,7 +10,7 @@ public class Connection {
     public final String authToken;
     public final Session session;
     public final int gameId;
-    private static final Gson gson = new Gson();
+    private static final Gson GSON = new Gson();
 
     public Connection(String authToken, Session session, int gameId) {
         this.authToken = authToken;
@@ -20,7 +20,7 @@ public class Connection {
 
     public void send(ServerMessage message) throws IOException {
         if (session.isOpen()) {
-            String jsonMessage = gson.toJson(message);
+            String jsonMessage = GSON.toJson(message);
             session.getRemote().sendString(jsonMessage);
         }
     }

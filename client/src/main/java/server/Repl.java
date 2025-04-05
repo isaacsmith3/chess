@@ -64,7 +64,8 @@ public class Repl {
                             currentState = State.PRE_LOGIN;
                             System.out.println(result);
                         } else if (input.startsWith("join")) {
-                            if (!result.startsWith("Error:") && !result.startsWith("Usage:") && !result.startsWith("Invalid") && !result.startsWith("Game")) {
+                            if (!result.startsWith("Error:") && !result.startsWith("Usage:") &&
+                                    !result.startsWith("Invalid") && !result.startsWith("Game")) {
                                 String[] tokens = input.split(" ");
                                 String gameId = tokens[1];
                                 String playerColor = tokens[2];

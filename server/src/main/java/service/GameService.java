@@ -56,38 +56,43 @@ public class GameService {
             String playerColor = gameRequest.playerColor();
 
             if (verifiedAuth == null) {
-                throw new InvalidAuthTokenException("Invalid auth token");
+                throw new InvalidAuthTokenException("Invalid auth token (join)");
             }
 
             GameData game = gameDAO.getGame(gameRequest);
 
             if (game == null) {
-                throw new InvalidGameRequestException("Game does not exist");
+                throw new InvalidGameRequestException("Game does not exist (join)");
             }
 
-            GameData updatedGame;
-
-            if (Objects.equals(playerColor, "WHITE")) {
-                if (game.whiteUsername() == null) {
-                    updatedGame = new GameData(game.gameID(), verifiedAuth.userName(), game.blackUsername(), game.gameName(), game.game());
-                } else {
-                    throw new InvalidGameException("White player already exists");
-                }
-            } else if (Objects.equals(playerColor, "BLACK")) {
-                if (game.blackUsername() == null) {
-                    updatedGame = new GameData(game.gameID(), game.whiteUsername(), verifiedAuth.userName(), game.gameName(), game.game());
-                } else {
-                    throw new InvalidGameException("Black player already exists");
-                }
-            }
-            else {
-                throw new InvalidCredentialsException("Team color must be WHITE or BLACk");
-            }
+            GameData updatedGame = getGameData(playerColor, game, verifiedAuth);
 
             gameDAO.joinGame(updatedGame);
         } catch (DataAccessException e) {
             throw new InvalidAuthTokenException("Invalid auth token");
         }
+    }
+
+    private GameData getGameData(String playerColor, GameData game, AuthData verifiedAuth) throws InvalidGameException, InvalidCredentialsException {
+        GameData updatedGame;
+
+        if (Objects.equals(playerColor, "WHITE")) {
+            if (game.whiteUsername() == null) {
+                updatedGame = new GameData(game.gameID(), verifiedAuth.userName(), game.blackUsername(), game.gameName(), game.game());
+            } else {
+                throw new InvalidGameException("White player already exists");
+            }
+        } else if (Objects.equals(playerColor, "BLACK")) {
+            if (game.blackUsername() == null) {
+                updatedGame = new GameData(game.gameID(), game.whiteUsername(), verifiedAuth.userName(), game.gameName(), game.game());
+            } else {
+                throw new InvalidGameException("Black player already exists");
+            }
+        }
+        else {
+            throw new InvalidCredentialsException("Team color must be WHITE or BLACk");
+        }
+        return updatedGame;
     }
 
     public Collection<ListGamesResult> listGames(String authToken) throws InvalidAuthTokenException {
@@ -107,24 +112,6 @@ public class GameService {
         return gameDAO.getGame(gameRequest);
     }
 
-    public AuthData getAuth(String authToken) throws InvalidAuthTokenException {
-        Object authDataCollection = authTokenDAO.getAuthTokens();
-        if (authDataCollection == null) {
-            throw new InvalidAuthTokenException("No auth token found");
-        }
-        AuthData authData = null;
-        for (var a : (Collection<AuthData>) authDataCollection) {
-            if (a.authToken() == authToken) {
-                authData = new AuthData(a.authToken(), a.userName());
-            }
-        }
-        if (authData == null) {
-            throw new InvalidAuthTokenException("Invalid auth token");
-        }
-        return authData;
-
-    }
-
     public void updateGame(String authToken, UpdateGameRequest gameRequest)
             throws InvalidAuthTokenException, InvalidGameException, InvalidCredentialsException, InvalidGameRequestException {
         try {
@@ -132,19 +119,19 @@ public class GameService {
             String playerColor = gameRequest.playerColor();
 
             if (verifiedAuth == null) {
-                throw new InvalidAuthTokenException("Invalid auth token");
+                throw new InvalidAuthTokenException("Invalid auth token (update)");
             }
 
             JoinGameRequest joinGameRequest = new JoinGameRequest(gameRequest.gameID(), gameRequest.playerColor());
 
             GameData game = gameDAO.getGame(joinGameRequest);
 
-            if (gameRequest.game() != null) { // For the case where we are updating the game too
+            if (gameRequest.game() != null) {
                 game = new GameData(game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName(), gameRequest.game());
             }
 
             if (game == null) {
-                throw new InvalidGameRequestException("Game does not exist");
+                throw new InvalidGameRequestException("Game does not exist (update)");
             }
 
             GameData updatedGame;
@@ -182,7 +169,7 @@ public class GameService {
             String playerColor = gameRequest.playerColor();
 
             if (verifiedAuth == null) {
-                throw new InvalidAuthTokenException("Invalid auth token");
+                throw new InvalidAuthTokenException("Invalid auth token (leave)");
             }
 
             JoinGameRequest joinGameRequest = new JoinGameRequest(gameRequest.gameID(), gameRequest.playerColor());
@@ -194,7 +181,7 @@ public class GameService {
             }
 
             if (game == null) {
-                throw new InvalidGameRequestException("Game does not exist");
+                throw new InvalidGameRequestException("Game does not exist (leave)");
             }
 
             GameData updatedGame;
